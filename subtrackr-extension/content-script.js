@@ -159,6 +159,11 @@ function runDetectionIfNeeded() {
     return;
   }
 
+  const origin = window.location.origin;
+  if (origin === "http://127.0.0.1:5501" || origin === "http://localhost:5501") {
+    return;
+  }
+
   if (isLikelySubscriptionPage()) {
     showSubtrackrPopup();
   }
