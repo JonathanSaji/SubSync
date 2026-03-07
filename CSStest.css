@@ -9,8 +9,10 @@
 :root {
     --bg-main: #000000;
     --bg-card: #121212;
-    --accentColour: #ffc425;
+    --accentColour: #ffd700;
     --accentColour-soft: rgba(255, 215, 0, 0.15);
+    --accent-dim:    rgba(255, 215, 0, 0.12);
+    --accent-glow:   rgba(255, 215, 0, 0.35);
     --text-main: #ffffff;
     --text-muted: #b3b3b3;
     --border-subtle: #2a2a2a;
@@ -210,7 +212,7 @@ body {
   flex-shrink: 0;
 }
 
-/*========= Dashboard Section ==========*/
+/*============ Dashboard Section ==========*/
 .section-frame {
   max-width: 1160px;
   margin: 0 auto;
@@ -276,7 +278,7 @@ body {
 .stat-value.accent { color: var(--accent); }
 .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
-/* Button styling */
+/*================Button styling ==================*/
 .btn{
     border-radius: 999px;
     border: 1px solid transparent;
@@ -290,7 +292,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 14px 30px rgba(181, 197, 34, 0.4);
+    box-shadow: 0 6px 24px var(--accent-glow);
     transition: background-color var(--transition-med), color var(--transition-med),
         border-color var(--transition-med), box-shadow var(--transition-med),
         transform var(--transition-fast);
@@ -317,13 +319,6 @@ body {
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-/* Hover enfifgegcat */
-.my-button:hover {
-    background-color: #000000;
-    border: 2px solid #ff0000; /* 2px red border */
-    color: rgb(255, 255, 255);
 }
 
 .app-footer {
@@ -431,7 +426,7 @@ body {
 .modal-close:hover { color: var(--text-main); }
 
 
-/*LOGIN*/
+/*================= LOGIN ===================*/
 /* Auth lock state */
 body.auth-locked main,
 body.auth-locked .nav-wrapper {

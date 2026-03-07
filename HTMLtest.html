@@ -13,34 +13,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <script src="script.js"></script>
 
-<!-- Title Header Creation-->
 </head>
 <body>
 
-    <header class="app-header" id="top">
-      <nav class="nav-bar">
-        <div class="nav-left">
-          <img src=AppLogo.png>
-          <div class="appName">SubSync</div>
+  <!--============== Simple Login Content ================-->
+  <div class="login-overlay" id="loginOverlay" aria-hidden="false">
+    <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <h1 class="login-title" id="loginTitle">Sign in to SubSync</h1>
+      <p class="login-subtitle">
+        Use one of the test accounts to log in:
+        <strong>user1 / pass1</strong> or <strong>user2 / pass2</strong>.
+      </p>
+      <form class="login-form" id="loginForm">
+        <div class="login-row">
+          <label for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" autocomplete="off" required />
         </div>
-
-        <div class="nav-center">
-          <!-- href links to a id of an element -->
-          <a href="#dashboard" class="nav-link">Dashboard</a>
-          <a href="#insights" class="nav-link">Insights</a>
-          <a href="#ai-advisor" class="nav-link">AI Advisor</a>
+        <div class="login-row">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" required />
         </div>
+        <p class="login-error" id="loginError" aria-live="polite"></p>
+        <button type="submit" class="btn login-submit">Log in</button>
+      </form>
+    </div>
+  </div>
 
-        <div class="nav-right">
-          <span class="current-user-label" id="currentUserLabel">Not signed in</span>
-          <button class="btn btn-soft btn-small" id="logoutBtn" type="button">Log out</button>
-          <button class="btn" id="openAddModalNav">Add Subscription</button>
-          <!-- <button class="btn btn-primary btn-small" id="openAddModalNav">Add Subscription</button> -->
-        </div>
+  <!--=========== Main Page Content ===========-->
+  <!-- Title Header Creation-->
+  <header class="app-header" id="top">
+    <nav class="nav-bar">
+      <div class="nav-left">
+        <img src=AppLogo.png>
+        <div class="appName">SubSync</div>
+      </div>
 
-        <div class = "header-main"></div>
-      </nav>
-    </header>
+      <div class="nav-center">
+        <!-- href links to a id of an element -->
+        <a href="#dashboard" class="nav-link">Dashboard</a>
+        <a href="#insights" class="nav-link">Insights</a>
+        <a href="#ai-advisor" class="nav-link">AI Advisor</a>
+      </div>
+
+      <div class="nav-right">
+        <span class="current-user-label" id="currentUserLabel">Not signed in</span>
+        <button class="btn btn-soft btn-small" id="logoutBtn" type="button">Log out</button>
+        <button class="btn" id="openAddModalNav">Add Subscription</button>
+        <!-- <button class="btn btn-primary btn-small" id="openAddModalNav">Add Subscription</button> -->
+      </div>
+
+      <div class = "header-main"></div>
+    </nav>
+  </header>
 
   <section class="intro-section">
     <div class="intro-text">
@@ -56,7 +80,7 @@
       <div class="data-preview">  <!-- Panel within the frame -->
         <div class="preview-card">
             <span class="preview-title">Monthly Spending</span>
-            <span id="monthlySpending" class="preview-total">Monthly Spending</span>
+            <span class="preview-total monthly-spending" id="monthly-spending">Monthly Spending</span>
         </div>
 
         <div clas="data-list">  
@@ -82,13 +106,13 @@
 
   <section id="dashboard" class="section-frame">
     <span class="section-label">Dashboard</span>
-    <h2 class="section-title">Your Subscriptions</h2>
+    <h2 class="section-title">Subscription Summary</h2>
     <p class="section-sub">A full overview of everything you're paying for, and when it's due.</p>
 
     <div class="cards-grid">
       <div class="stat-card">
         <div class="stat-label">Monthly Total</div>
-        <div id="monthlySpending" class="stat-value accent">Monthly Spending</div>
+        <div class="stat-value accent monthly-spending">Monthly Spending</div>
         <div class="stat-sub">Across 6 services</div>
       </div>
       <div class="stat-card">
@@ -139,34 +163,6 @@
     </div>
   </div>
 </div>
-
-
-
-<!-- Simple Login Overlay -->
-  <div class="login-overlay" id="loginOverlay" aria-hidden="false">
-    <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-      <h1 class="login-title" id="loginTitle">Sign in to SubGuard</h1>
-      <p class="login-subtitle">
-        Use one of the test accounts to log in:
-        <strong>user1 / pass1</strong> or <strong>user2 / pass2</strong>.
-      </p>
-      <form class="login-form" id="loginForm">
-        <div class="login-row">
-          <label for="loginUsername">Username</label>
-          <input type="text" id="loginUsername" autocomplete="off" required />
-        </div>
-        <div class="login-row">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" required />
-        </div>
-        <p class="login-error" id="loginError" aria-live="polite"></p>
-        <button type="submit" class="btn btn-primary btn-full login-submit">
-          Log in
-        </button>
-      </form>
-    </div>
-  </div>
-
 
 </body>
 </html>
