@@ -159,11 +159,6 @@ function runDetectionIfNeeded() {
     return;
   }
 
-  const origin = window.location.origin;
-  if (origin === "http://127.0.0.1:5501" || origin === "http://localhost:5501") {
-    return;
-  }
-
   if (isLikelySubscriptionPage()) {
     showSubtrackrPopup();
   }
@@ -176,6 +171,13 @@ if (document.readyState === "complete" || document.readyState === "interactive")
     setTimeout(runDetectionIfNeeded, 300);
   });
 }
+
+
+//So that if the app opens up the extension does not open
+const origin = window.location.origin;
+  if (origin === "http://127.0.0.1:5501" || origin === "http://localhost:5501") {
+    return;
+  }
 
 (function patchHistoryForSpaSupport() {
   const origPushState = history.pushState;

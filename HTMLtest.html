@@ -1,18 +1,148 @@
+<!-- HTML Set Up-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>SubGuard — AI-Powered Subscription Advisor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="SubGuard helps seniors understand, manage, and decide which subscriptions are worth keeping." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="CSStest.css" />
-  <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubSync</title>
+
+<!-- Linking-->
+<link rel="stylesheet" href="CSStest.css">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<script src="script.js"></script>
+
+<!-- Title Header Creation-->
 </head>
 <body>
-  <!-- Simple Login Overlay -->
+
+    <header class="app-header" id="top">
+      <nav class="nav-bar">
+        <div class="nav-left">
+          <img src=AppLogo.png>
+          <div class="appName">SubSync</div>
+        </div>
+
+        <div class="nav-center">
+          <!-- href links to a id of an element -->
+          <a href="#dashboard" class="nav-link">Dashboard</a>
+          <a href="#insights" class="nav-link">Insights</a>
+          <a href="#ai-advisor" class="nav-link">AI Advisor</a>
+        </div>
+
+        <div class="nav-right">
+          <span class="current-user-label" id="currentUserLabel">Not signed in</span>
+          <button class="btn btn-soft btn-small" id="logoutBtn" type="button">Log out</button>
+          <button class="btn" id="openAddModalNav">Add Subscription</button>
+          <!-- <button class="btn btn-primary btn-small" id="openAddModalNav">Add Subscription</button> -->
+        </div>
+
+        <div class = "header-main"></div>
+      </nav>
+    </header>
+
+  <section class="intro-section">
+    <div class="intro-text">
+      <h1>Your <span> Solution </span> to Lost Subscriptions. </h1>
+
+      <div class="intro-buttons">
+        <button class="btn" id="addBtn">+ Add Subscription</button>
+        <a href="#dashboard" class="btn btn-outline">View Dashboard</a>
+      </div>
+    </div>
+
+    <div class="dashboard-summary"> <!-- Left side frame of intro section-->
+      <div class="data-preview">  <!-- Panel within the frame -->
+        <div class="preview-card">
+            <span class="preview-title">Monthly Spending</span>
+            <span id="monthlySpending" class="preview-total">Monthly Spending</span>
+        </div>
+
+        <div clas="data-list">  
+          <!-- Preview list of subscriptions and their costs -->
+            <div class="data-item">
+                <span class="data-name">Netflix</span>
+                <span class="data-amount">**INSERT VARIABLES / Polish</span>
+            </div>
+            <div class="data-item">
+                <span class="data-name">Spotify</span>
+                <span class="data-amount">**INSERT VARIABLES</span>
+            </div>
+            <div class="data-item">
+                <span class="data-name">Amazon Prime</span>
+                <span class="data-amount">**INSERT VARIABLE</span>
+            </div>
+        </div> 
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== DASHBOARD ======== -->
+
+  <section id="dashboard" class="section-frame">
+    <span class="section-label">Dashboard</span>
+    <h2 class="section-title">Your Subscriptions</h2>
+    <p class="section-sub">A full overview of everything you're paying for, and when it's due.</p>
+
+    <div class="cards-grid">
+      <div class="stat-card">
+        <div class="stat-label">Monthly Total</div>
+        <div id="monthlySpending" class="stat-value accent">Monthly Spending</div>
+        <div class="stat-sub">Across 6 services</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Annual Estimate</div>
+        <div class="stat-value">,019</div>
+        <div class="stat-sub">+12% from last year</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Renewing Soon</div>
+        <div class="stat-value" style="color:#ffd700">2</div>
+        <div class="stat-sub">Within 7 days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">TBD</div>
+        <div class="stat-value" style="color:#4ade80">8</div>
+        <div class="stat-sub">TBD</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app-footer">
+    <p>SubSync keeps your renewals visible so surprises don’t hit your balance.</p>
+  </footer>
+
+
+ <!-- ======== MODAL ======== -->
+<div class="modal-overlay" id="addModalOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+    <button class="modal-close" id="closeAddModal" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="addModalTitle">What would you like to add?</h2>
+    <p class="modal-subtitle">Choose the type of service you want to track.</p>
+
+    <div class="modal-choice-buttons">
+      <button class="modal-choice-btn" id="chooseSubscription">
+        <span class="choice-icon">📋</span>
+        <div>
+          <span class="choice-label">Subscription</span>
+          <span class="choice-desc">A recurring monthly or annual payment</span>
+        </div>
+      </button>
+      <button class="modal-choice-btn" id="chooseTrial">
+        <span class="choice-icon">⏳</span>
+        <div>
+          <span class="choice-label">Free Trial</span>
+          <span class="choice-desc">Track a trial so you don't forget to cancel</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Simple Login Overlay -->
   <div class="login-overlay" id="loginOverlay" aria-hidden="false">
     <div class="login-card" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <h1 class="login-title" id="loginTitle">Sign in to SubGuard</h1>
@@ -37,366 +167,6 @@
     </div>
   </div>
 
-  <div class="page-gradient"></div>
 
-  <!-- Navigation -->
-  <header class="nav-wrapper" id="top">
-    <nav class="nav">
-      <div class="nav-left">
-        <div class="logo">SubGuard</div>
-      </div>
-      <div class="nav-center">
-        <a href="#dashboard" class="nav-link">Dashboard</a>
-        <a href="#insights" class="nav-link">Insights</a>
-        <a href="#ai-advisor" class="nav-link">AI Advisor</a>
-      </div>
-      <div class="nav-right">
-        <span class="current-user-label" id="currentUserLabel">Not signed in</span>
-        <button class="btn btn-soft btn-small" id="logoutBtn" type="button">Log out</button>
-        <button class="btn btn-primary btn-small" id="openAddModalNav">Add Subscription</button>
-      </div>
-    </nav>
-  </header>
-
-  <main>
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-      <div class="hero-inner">
-        <div class="hero-content">
-          <h1 class="hero-title">
-            Take Control of Your Subscriptions.
-          </h1>
-          <p class="hero-subtitle">
-            SubGuard helps you understand what you’re paying for, how often you use it,
-            and whether it’s truly worth keeping — with gentle AI guidance built for seniors.
-          </p>
-          <div class="hero-actions">
-            <button class="btn btn-primary" id="openDashboardCta">Open Dashboard</button>
-            <button class="btn btn-ghost" id="heroAddSubscription">Add Subscription</button>
-          </div>
-          <div class="hero-highlight">
-            <div class="hero-highlight-pill">
-              <span class="pill-dot"></span>
-              Smart suggestions based on usage, cost, and emotional value.
-            </div>
-          </div>
-        </div>
-        <div class="hero-visual">
-          <div class="hero-card hero-card-main">
-            <div class="hero-card-header">
-              <span class="hero-card-title">Monthly Overview</span>
-              <span class="hero-card-amount">$124.96</span>
-            </div>
-            <div class="hero-card-body">
-              <div class="mini-stat">
-                <span class="mini-label">Not used in 60+ days</span>
-                <span class="mini-value">4</span>
-              </div>
-              <div class="mini-stat">
-                <span class="mini-label">Suggested to cancel</span>
-                <span class="mini-value accent">2</span>
-              </div>
-              <div class="mini-bar-row">
-                <span class="mini-bar-label">Emotional value balance</span>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="hero-card hero-card-secondary">
-            <div class="hero-chip-row">
-              <span class="hero-chip">Netflix</span>
-              <span class="hero-chip hero-chip-warning">Rarely used</span>
-            </div>
-            <p class="hero-advice">
-              “You’ve barely watched Netflix this month. Consider pausing it for now.”
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="hero-background-shape hero-bg-blob-1"></div>
-      <div class="hero-background-shape hero-bg-blob-2"></div>
-    </section>
-
-    <!-- Dashboard + Insights + AI Advisor -->
-    <section class="dashboard-section" id="dashboard">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Your Subscription Dashboard</h2>
-          <p class="section-subtitle">
-            At a glance view of what you pay for every month and how often you truly use it.
-          </p>
-        </div>
-        <button class="btn btn-outline" id="addSubscriptionTop">Add Subscription</button>
-      </div>
-
-      <!-- Stats Summary -->
-      <section class="stats-grid" id="insights">
-        <article class="stat-card fade-in">
-          <div class="stat-label">Total Monthly Cost</div>
-          <div class="stat-main">$124.96</div>
-          <div class="stat-foot">Across 7 active subscriptions</div>
-        </article>
-        <article class="stat-card fade-in">
-          <div class="stat-label">Not Used Recently</div>
-          <div class="stat-main">3</div>
-          <div class="stat-foot">No activity in the last 45+ days</div>
-        </article>
-        <article class="stat-card fade-in">
-          <div class="stat-label">Most Expensive Subscription</div>
-          <div class="stat-main">$29.99</div>
-          <div class="stat-foot">Premium TV Bundle</div>
-        </article>
-      </section>
-
-      <div class="layout-grid">
-        <!-- Subscription Cards -->
-        <section class="subscriptions-panel fade-in">
-          <div class="subscriptions-header">
-            <h3 class="panel-title">Active Subscriptions</h3>
-            <div class="subscriptions-filters">
-              <button class="chip chip-active">All</button>
-              <button class="chip">Rarely Used</button>
-              <button class="chip">Expensive</button>
-            </div>
-          </div>
-
-          <div class="subscriptions-grid">
-            <!-- Card 1 -->
-            <article class="subscription-card card-animate">
-              <header class="subscription-header">
-                <div>
-                  <h4 class="subscription-name">Netflix</h4>
-                  <p class="subscription-meta">Streaming • Entertainment</p>
-                </div>
-                <span class="badge badge-warning">Rarely Used</span>
-              </header>
-              <div class="subscription-body">
-                <div class="subscription-row">
-                  <span class="label">Monthly cost</span>
-                  <span class="value">$19.99</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Last used</span>
-                  <span class="value">27 days ago</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Emotional value</span>
-                  <span class="value">6 / 10</span>
-                </div>
-              </div>
-              <footer class="subscription-footer">
-                <button class="btn btn-soft">View Details</button>
-              </footer>
-            </article>
-
-            <!-- Card 2 -->
-            <article class="subscription-card card-animate">
-              <header class="subscription-header">
-                <div>
-                  <h4 class="subscription-name">Spotify</h4>
-                  <p class="subscription-meta">Music • Entertainment</p>
-                </div>
-                <span class="badge badge-success">Active</span>
-              </header>
-              <div class="subscription-body">
-                <div class="subscription-row">
-                  <span class="label">Monthly cost</span>
-                  <span class="value">$12.99</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Last used</span>
-                  <span class="value">Today</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Emotional value</span>
-                  <span class="value">9 / 10</span>
-                </div>
-              </div>
-              <footer class="subscription-footer">
-                <button class="btn btn-soft">View Details</button>
-              </footer>
-            </article>
-
-            <!-- Card 3 -->
-            <article class="subscription-card card-animate">
-              <header class="subscription-header">
-                <div>
-                  <h4 class="subscription-name">Amazon Prime</h4>
-                  <p class="subscription-meta">Shopping • Delivery</p>
-                </div>
-                <span class="badge badge-neutral">Expensive</span>
-              </header>
-              <div class="subscription-body">
-                <div class="subscription-row">
-                  <span class="label">Monthly cost</span>
-                  <span class="value">$16.99</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Last used</span>
-                  <span class="value">5 days ago</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Emotional value</span>
-                  <span class="value">7 / 10</span>
-                </div>
-              </div>
-              <footer class="subscription-footer">
-                <button class="btn btn-soft">View Details</button>
-              </footer>
-            </article>
-
-            <!-- Card 4 -->
-            <article class="subscription-card card-animate">
-              <header class="subscription-header">
-                <div>
-                  <h4 class="subscription-name">Cable TV Package</h4>
-                  <p class="subscription-meta">TV • Entertainment</p>
-                </div>
-                <span class="badge badge-neutral">Expensive</span>
-              </header>
-              <div class="subscription-body">
-                <div class="subscription-row">
-                  <span class="label">Monthly cost</span>
-                  <span class="value">$29.99</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Last used</span>
-                  <span class="value">12 days ago</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Emotional value</span>
-                  <span class="value">5 / 10</span>
-                </div>
-              </div>
-              <footer class="subscription-footer">
-                <button class="btn btn-soft">View Details</button>
-              </footer>
-            </article>
-
-            <!-- Card 5 -->
-            <article class="subscription-card card-animate">
-              <header class="subscription-header">
-                <div>
-                  <h4 class="subscription-name">Medication Reminder App</h4>
-                  <p class="subscription-meta">Health • Safety</p>
-                </div>
-                <span class="badge badge-success">Active</span>
-              </header>
-              <div class="subscription-body">
-                <div class="subscription-row">
-                  <span class="label">Monthly cost</span>
-                  <span class="value">$4.99</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Last used</span>
-                  <span class="value">Everyday</span>
-                </div>
-                <div class="subscription-row">
-                  <span class="label">Emotional value</span>
-                  <span class="value">10 / 10</span>
-                </div>
-              </div>
-              <footer class="subscription-footer">
-                <button class="btn btn-soft">View Details</button>
-              </footer>
-            </article>
-          </div>
-        </section>
-
-        <!-- AI Advisor Panel -->
-        <aside class="ai-panel fade-in" id="ai-advisor">
-          <header class="ai-header">
-            <div>
-              <h3 class="panel-title">AI Advisor</h3>
-              <p class="panel-subtitle">Ask if you should keep, pause, or cancel a subscription.</p>
-            </div>
-          </header>
-          <div class="ai-chat-window" id="chatWindow">
-            <div class="chat-message ai">
-              <div class="chat-avatar">SG</div>
-              <div class="chat-bubble">
-                Hello! I’m your SubGuard advisor. Ask me about any subscription, and I’ll help you decide what to do.
-              </div>
-            </div>
-            <div class="chat-message user">
-              <div class="chat-bubble">
-                Should I cancel Netflix? I don’t watch it very often anymore.
-              </div>
-            </div>
-            <div class="chat-message ai">
-              <div class="chat-avatar">SG</div>
-              <div class="chat-bubble">
-                You’ve watched Netflix only a few times this month and you have similar streaming services.
-                You might pause it for 2–3 months and see if you miss it. If not, cancelling could save you about
-                $240 a year.
-              </div>
-            </div>
-          </div>
-          <form class="ai-input-row" id="chatForm">
-            <input
-              type="text"
-              id="chatInput"
-              class="ai-input"
-              placeholder="Ask, e.g. “Is Spotify still worth it for me?”"
-              autocomplete="off"
-            />
-            <button type="submit" class="btn btn-primary btn-icon" id="sendMessageBtn">
-              <span class="btn-icon-symbol">➤</span>
-            </button>
-          </form>
-          <p class="ai-disclaimer">
-            Advice is informational only and not financial guidance.
-          </p>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <!-- Add Subscription Modal -->
-  <div class="modal-overlay" id="addModalOverlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
-      <button class="modal-close" id="closeAddModal" aria-label="Close add subscription form">✕</button>
-      <h2 class="modal-title" id="addModalTitle">Add Subscription</h2>
-      <p class="modal-subtitle">
-        Track a new subscription so SubGuard can help you decide what to keep.
-      </p>
-      <form class="modal-form" id="addSubscriptionForm">
-        <div class="form-row">
-          <label for="serviceName">Service Name</label>
-          <input type="text" id="serviceName" name="serviceName" placeholder="e.g. Netflix" required />
-        </div>
-        <div class="form-row two-column">
-          <div class="form-field">
-            <label for="monthlyCost">Monthly Cost ($)</label>
-            <input type="number" step="0.01" min="0" id="monthlyCost" name="monthlyCost" placeholder="e.g. 12.99" required />
-          </div>
-          <div class="form-field">
-            <label for="lastUsed">Last Used Date</label>
-            <input type="date" id="lastUsed" name="lastUsed" />
-          </div>
-        </div>
-        <div class="form-row">
-          <label for="emotionalValue">Emotional Value</label>
-          <div class="slider-row">
-            <input
-              type="range"
-              id="emotionalValue"
-              name="emotionalValue"
-              min="1"
-              max="10"
-              value="7"
-            />
-            <span class="slider-value" id="emotionalValueDisplay">7 / 10</span>
-          </div>
-          <p class="field-hint">
-            1 = I don’t mind losing it • 10 = It really matters to me
-          </p>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Save Subscription</button>
-      </form>
-    </div>
-  </div>
 </body>
 </html>
