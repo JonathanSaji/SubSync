@@ -98,10 +98,31 @@ document.addEventListener("DOMContentLoaded", () => {
 // 4. SUBSCRIPTION TRACKER LOGIC (Our New Code)
 // ==========================================
 let subscriptions = [
-    { id: 1, name: 'Netflix', amount: 22.99, date: '2026-03-07', icon: '🎬', color: 'rgba(229,9,20,0.15)' },
-    { id: 2, name: 'Spotify', amount: 10.99, date: '2026-03-12', icon: '🎵', color: 'rgba(30,215,96,0.15)' },
-    { id: 3, name: 'ChatGPT Plus', amount: 26.99, date: '2026-03-05', icon: '🤖', color: 'rgba(255,215,0,0.12)' }
+    { id: 1, name: 'Netflix', amount: 22.99, date: '2026-03-07', subscriptionType: 'Entertainment', color: 'rgba(229,9,20,0.15)' },
+    { id: 2, name: 'Spotify', amount: 10.99, date: '2026-03-12', subscriptionType: 'Entertainment', color: 'rgba(30,215,96,0.15)' },
+    { id: 3, name: 'ChatGPT Plus', amount: 26.99, date: '2026-03-05', subscriptionType: 'Productivity', color: 'rgba(255,215,0,0.12)' }
 ];
+
+function switchPage(pageId, clickedButton) {
+  // Hide all the pages
+  const allPages = document.querySelectorAll('.app-page');
+  allPages.forEach(page => {
+    page.classList.add('hidden');
+  });
+  //Select the targeted page
+  const targetPage = document.getElementById(pageId);
+  if (targetPage) {
+    targetPage.classList.remove('hidden');
+  }
+  // Update active button state
+  const allButtons = document.querySelectorAll('.nav-btn');
+  allButtons.forEach(btn => {
+    btn.classList.remove('active');
+  });
+  if (clickedButton) {
+    clickedButton.classList.add('active');
+  }
+}
 
 function renderSubscriptions() {
     const container = document.getElementById('subs-container');
@@ -125,6 +146,12 @@ function renderSubscriptions() {
             statusText = 'Soon';
         }
 
+        if (sub.subscriptionType == 'Entertainment'){ sub.icon = '🎬';}
+        else if (sub.subscriptionType == 'Productivity'){ sub.icon = '📚';}
+        else if (sub.subscriptionType == 'Utilities'){ sub.icon = '💡';}
+        else if (sub.subscriptionType == 'Business'){ sub.icon = '💼';}
+        else{ sub.icon = '❓'; }
+
         // Create the row wrapper
         const item = document.createElement('div');
         item.className = 'table-row';
@@ -136,7 +163,7 @@ function renderSubscriptions() {
                 ${sub.name}
             </div>
             <div>$${sub.amount.toFixed(2)}</div>
-            <div class="row-muted">${sub.category || 'Subscription'}</div>
+            <div class="row-muted">${sub.subscriptionType || 'Subscription'}</div>
             <div class="row-muted">${sub.date}</div>
             <div><span class="tag ${statusClass}">${statusText}</span></div>
             <div>
