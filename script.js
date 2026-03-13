@@ -1,3 +1,4 @@
+// Ensures Site is loaded before running any scripts
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // MODAL LOGIC
@@ -69,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // 2. SUBSCRIPTION FORM SUBMIT
+    // SUBSCRIPTION FORM SUBMIT
     // ==========================================
     document.getElementById("subForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -119,9 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
         closeSubForm();
     });
 
-    // ==========================================
+    // =======================================
     // FREE TRIAL FORM SUBMIT
-    // ==========================================
+    // =======================================
     document.getElementById("trialForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name     = document.getElementById("trialName").value.trim();
@@ -174,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentUserLabel = document.getElementById("currentUserLabel");
     const logoutBtn       = document.getElementById("logoutBtn");
 
+    // Update UI based on auth state
     const updateAuthUi = () => {
         if (!currentUser) {
             document.body.classList.add("auth-locked");
@@ -294,10 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSubscriptions();
 });
 
-// ==========================================
-// SUBSCRIPTION DATA
-// ==========================================
-let subscriptions = [];
+let subscriptions = []; //Subscription array to hold all subscription objects in memory
 
 // ==========================================
 // API FUNCTIONS
@@ -313,15 +312,12 @@ async function loadSubscriptions() {
     renderSubscriptions();
     updateAllStats();
 }
-    // NOTE: I removed the stray "Add logic" that was crashing the page here.
-    // We will build a proper Add Form handler for the tracker below!
 
       if (window.location.hash === '#ai-advisor') {
-    // Replace this with your actual function that shows the AI chatbox
     if (typeof openAiAdvisor === 'function') {
       openAiAdvisor();
     } else {
-      // Fallback: manually show the chatbox element
+      // Manually show the chatbox element
       const aiTab = document.getElementById('ai-advisor-tab');
       const aiContent = document.getElementById('ai-advisor-content');
       if (aiTab) aiTab.classList.add('active'); // or whatever your tab uses
@@ -329,6 +325,7 @@ async function loadSubscriptions() {
     }
   }
 
+  // Loading and saving from the json file
 async function saveSubscription(sub) {
     try {
         const res = await fetch('/api/subscriptions', {
@@ -370,10 +367,12 @@ function switchPage(pageId, clickedButton) {
     clickedButton?.classList.add('active');
 }
 
+// Updates all the variable dependant components shown on html
 function updateAllStats(){
     const total = subscriptions
         .filter(s => !s.isTrial)
         .reduce((sum, s) => sum + s.amount, 0);
+    // Selects elements with the ID 'monthlySpending' and updates their text content to show the total monthly spending, formatted as currency with two decimal places.
     document.querySelectorAll('#monthlySpending').forEach(el => {
         el.textContent = `$${total.toFixed(2)}`;
     });
@@ -453,7 +452,7 @@ function calculateTime(dateString){
 // ==========================================
 // RENDER TABLE
 // ==========================================
-function renderSubscriptions() {
+function renderSubscriptions() { // Creates/ updates subscription list, dynamically generates html based on subscription data in memory
     const container = document.getElementById('subs-container');
     if (!container) return;
 
@@ -546,6 +545,7 @@ async function deleteSub(id) {
     }
 }
 
+// Visual #1 on insights page - spend by service, with bars 
 function renderServiceSpendByService() {
     const listEl = document.getElementById('serviceSpendList');
     const previewEl = document.getElementById('insightsTopServices');
