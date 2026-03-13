@@ -107,8 +107,16 @@ app.post('/api/ask', async (req, res) => {
 
   // Build subscription text for context
   const subscriptionText = subscriptions
-    .map(sub => `${sub.name} costs $${sub.cost}/month, last used ${sub.lastUsed}, emotional value ${sub.emotionalValue}/10.`)
-    .join(" ");
+  .map(sub => {
+    const cost = sub.amount ?? 0;
+    const lastUsed = sub.date ?? "unknown";
+    const emotionalValue = sub.emotionalValue ?? "N/A";
+    const category = sub.subscriptionType ?? "Other";
+    const trialStatus = sub.isTrial ? "Trial" : "Paid";
+
+    return `${sub.name} costs $${cost}/month, last used ${lastUsed}, category ${category}, status ${trialStatus}, emotional value ${emotionalValue}/10.`;
+  })
+  .join(" ");
 
   try {
     const response = await openai.chat.completions.create({
