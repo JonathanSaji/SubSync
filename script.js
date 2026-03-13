@@ -460,13 +460,29 @@ function renderSubscriptions() {
     container.innerHTML = '';
 
     subscriptions.forEach(sub => {
-        //simple math to calculate the amount od days remaining
-        // const daysRemaining = Math.ceil((new Date(sub.date) - new Date()) / (1000 * 60 * 60 * 24));
-        const daysRemaining = calculateTime(sub.date);
-        let daysRemainingDisplay = daysRemaining + " days";
-        if (daysRemaining == 0){
-            daysRemainingDisplay = "Today";
+        // Calculate days remaining until next renewal.
+        // For non-trial subs, if the stored date is already overdue,
+        // virtually roll the renewal forward by months until it is no longer overdue.
+        let daysRemaining = calculateTime(sub.date);
 
+        if (!sub.isTrial && daysRemaining < 0) {
+            let d = new Date(sub.date);
+            if (!isNaN(d)) {
+                const now = new Date();
+                for (let i = 0; i < 48; i++) { // safety cap
+                    const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+                    if (diff >= 0) {
+                        daysRemaining = diff;
+                        break;
+                    }
+                    d.setMonth(d.getMonth() + 1);
+                }
+            }
+        }
+
+        let daysRemainingDisplay = daysRemaining + " days";
+        if (daysRemaining === 0){
+            daysRemainingDisplay = "Today";
         }
 
         let statusClass = 'status-ok';
@@ -478,7 +494,8 @@ function renderSubscriptions() {
             else if (daysRemaining <= 5) { statusClass = 'status-soon';   statusText = 'Ends Soon'; }
             else                         { statusClass = 'status-ok';     statusText = 'Trial'; }
         } else {
-            if (daysRemaining < 0)      { statusClass = 'status-cancel'; statusText = 'Overdue'; }
+            if (daysRemaining === 0)    { statusClass = 'status-cancel'; statusText = 'Due'; }
+            else if (daysRemaining < 0) { statusClass = 'status-cancel'; statusText = 'Overdue'; }
             else if (daysRemaining <= 7) { statusClass = 'status-soon';   statusText = 'Soon'; }
         }
 
@@ -528,53 +545,6 @@ async function deleteSub(id) {
         updateAllStats();
     }
 }
-
-// ==========================================
-// INSIGHTS: MONTHLY SPEND BY SERVICE
-// ==========================================
-
-function renderServiceSpendByService() {
-    const listEl = document.getElementById('serviceSpendList');
-    if (!listEl) return;
-
-    listEl.innerHTML = '';
-
-    const paidSubs = subscriptions.filter(s => !s.isTrial);
-
-    if (!paidSubs.length) {
-        listEl.innerHTML = '<div class="service-spend-empty">No paid subscriptions yet.</div>';
-        return;
-    }
-
-    const totalsByName = paidSubs.reduce((acc, sub) => {
-        const key = sub.name || 'Unnamed';
-        acc[key] = (acc[key] || 0) + (sub.amount || 0);
-        return acc;
-    }, {});
-
-    const entries = Object.entries(totalsByName);
-    entries.sort((a, b) => b[1] - a[1]);
-
-    const maxAmount = entries[0] ? entries[0][1] || 1 : 1;
-
-    entries.forEach(([name, amount]) => {
-        const percentage = Math.max(6, (amount / maxAmount) * 100);
-        const row = document.createElement('div');
-        row.className = 'service-spend-row';
-        row.innerHTML = `
-            <div class="service-spend-label">${name}</div>
-            <div class="service-spend-bar">
-                <div class="service-spend-bar-fill" style="width:${percentage}%;"></div>
-            </div>
-            <div class="service-spend-amount">$${amount.toFixed(2)}</div>
-        `;
-        listEl.appendChild(row);
-    });
-}
-
-// ==========================================
-// INSIGHTS: MONTHLY SPEND BY SERVICE
-// ==========================================
 
 function renderServiceSpendByService() {
     const listEl = document.getElementById('serviceSpendList');
