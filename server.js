@@ -106,15 +106,34 @@ app.post('/api/ask', async (req, res) => {
   if (!question) return res.status(400).json({ error: 'No question provided' });
 
   // Build subscription text for context
-  const subscriptionText = subscriptions
+const subscriptionText = subscriptions
   .map(sub => {
-    const cost = sub.amount ?? 0;
-    const lastUsed = sub.date ?? "unknown";
-    const emotionalValue = sub.emotionalValue ?? "N/A";
+    const cycle = (sub.billingCycle ?? "Monthly").toLowerCase();
+    const cycleCost = sub.amountPerCycle ?? 0;
+
+    let monthlyCost = 0;
+
+    switch (cycle) {
+      case "yearly":
+        monthlyCost = cycleCost / 12;
+        break;
+      case "bi-monthly":
+        monthlyCost = cycleCost / 2;
+        break;
+      case "weekly":
+        monthlyCost = cycleCost * 4;
+        break;
+      case "monthly":
+      default:
+        monthlyCost = cycleCost;
+    }
+
+    const nextBilling = sub.date ?? "unknown";
     const category = sub.subscriptionType ?? "Other";
     const trialStatus = sub.isTrial ? "Trial" : "Paid";
+    const trialEnd = sub.trialEndDate ? ` Trial ends ${sub.trialEndDate}.` : "";
 
-    return `${sub.name} costs $${cost}/month, last used ${lastUsed}, category ${category}, status ${trialStatus}, emotional value ${emotionalValue}/10.`;
+    return `${sub.name} is a ${category} subscription, status ${trialStatus}. It costs $${cycleCost} per ${cycle} cycle (about $${monthlyCost}/month). Next billing date ${nextBilling}.${trialEnd}`;
   })
   .join(" ");
 
