@@ -260,6 +260,17 @@ body {
 .row-name { display: flex; align-items: center; gap: 12px; font-weight: 500; }
 .row-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
 .row-muted { color: var(--text-muted); }
+.trial-badge {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: rgba(96,165,250,0.18);
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 .tag {
   display: inline-block;
   padding: 3px 10px;
@@ -267,13 +278,29 @@ body {
   font-size: 0.72rem;
   font-weight: 600;
 }
+.status-ok {               /* Free Trial (green) */
+  background: rgba(34,197,94,0.15);
+  color: #4ade80;
+}
+.status-soon {             /* Soon (orange, next 7 days) */
+  background: rgba(249,115,22,0.15);
+  color: #f97316;
+}
+.status-cancel {           /* Now / Overdue (red) */
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+}
+.status-later {            /* Later (grey, > 7 days) */
+  background: rgba(148,163,184,0.16);
+  color: #e5e7eb;
+}
 .status-ok     { background: rgba(34,197,94,0.15); color: #4ade80; }
 .status-soon   { background: rgba(255,215,0,0.12); color: var(--accentColour); }
 .status-cancel { background: rgba(239,68,68,0.12); color: #f87171; }
 
 
 /* ================= Insight Section ============== */
-.insights-one{
+.insights-one {
   max-width: 1160px;
   margin: 0 auto;
   padding: 30px 28px 30px;
@@ -281,11 +308,31 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
-  align-items: center;
+  align-items: stretch;
 }
 
-.insights-bars {
-  align-self: stretch;
+.insights-left {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.insights-right {
+  display: flex;
+  min-height: 0;
+}
+
+.insights-right .category-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.insights-right .category-chart-container {
+  flex: 1;
+  max-width: none;
+  min-height: 200px;
 }
 
 /* Monthly Spend by Service card (Insights, top-left) */
@@ -316,6 +363,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* Free Trials card: no max height so list extends as more trials are added */
+.service-spend-card--grows .service-spend-list {
+  min-height: 0;
 }
 
 .service-spend-row {
@@ -699,6 +751,42 @@ body.auth-locked .nav-wrapper {
   flex-direction: column;
   gap: 5px;
   margin-bottom: 20px;
+}
+
+/* Modal form inputs: dark background, white text */
+.modal input[type="text"],
+.modal input[type="number"],
+.modal input[type="date"],
+.modal select {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-main);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.modal input::placeholder {
+  color: var(--text-muted);
+}
+
+.modal input:focus,
+.modal select:focus {
+  outline: none;
+  border-color: var(--accentColour);
+}
+
+/* Date input calendar icon: white so it's visible on dark background */
+.modal input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.modal select option {
+  background: #0a0a0a;
+  color: var(--text-main);
 }
 
 /* ================= AI ADVISOR CHAT ================= */

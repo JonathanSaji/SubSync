@@ -85,7 +85,7 @@
           <div>Service</div>
           <div>Amount</div>
           <div>Category</div>
-          <div>Days Remaining</div>
+          <div>Next Payment In</div>
           <div>Status</div>
           <div>Action</div> 
       </div>
@@ -102,20 +102,28 @@
     <p class="section-sub">Data-driven insights to help you save money and optimize your subscriptions.</p>
 
     <div class="insights-one">
-      <div class="insights-bars">
+      <div class="insights-left">
         <div class="service-spend-card">
           <div class="service-spend-header">
-            <span class="service-spend-title">Monthly Spend by Service</span>
+            <span class="service-spend-title">Monthly Spending by Service</span>
           </div>
           <div id="serviceSpendList" class="service-spend-list">
             <!-- Filled dynamically from subscriptions -->
           </div>
         </div>
+        <div class="service-spend-card service-spend-card--grows">
+          <div class="service-spend-header">
+            <span class="service-spend-title">Current Free Trials</span>
+          </div>
+          <div id="freeTrialsList" class="service-spend-list">
+            <!-- Filled dynamically: trials ordered by days remaining -->
+          </div>
+        </div>
       </div>
-      <div class="pi-chart">
+      <div class="insights-right">
         <div class="category-card">
           <div class="category-card-header">
-            <span class="category-card-title">Spend by Category</span>
+            <span class="category-card-title">Spending by Category</span>
           </div>
           <div class="category-chart-container">
             <canvas id="categoryChart"></canvas>
@@ -124,9 +132,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="insights-two">
-    
     </div>
   </section>
 </div>
@@ -197,42 +202,72 @@
 
       <div class="modal-icon-header">📋</div>
       <h2 class="modal-title" id="subFormTitle">Add a Subscription</h2>
-      <p class="modal-subtitle" style="margin-bottom:22px;">Fill in the details of your recurring payment.</p>
+      <p class="modal-subtitle" style="margin-bottom:22px;">Fill in the Details</p>
 
       <form id="subForm" novalidate>
-
-        <div class="form-group">
-          <label for="subName">Service Name *</label>
-          <input type="text" id="subName" placeholder="e.g. Netflix, Adobe CC…" required />
-        </div>
-
-        <div class="form-row">
+        <!-- STEP 1: Basic details -->
+        <div id="subStep1" class="sub-step">
           <div class="form-group">
-            <label for="subAmount">Monthly Cost ($) *</label>
-            <input type="number" id="subAmount" placeholder="0.00" min="0" step="0.01" required />
+            <label for="subName">Service Name *</label>
+            <input type="text" id="subName" placeholder="e.g. Netflix, Adobe CC…" required />
           </div>
+
           <div class="form-group">
             <label for="subCategory">Category</label>
             <select id="subCategory">
               <option value="Entertainment">🎬 Entertainment</option>
               <option value="Productivity">📚 Productivity</option>
-              <option value="Utilities">💡 Utilities</option>
               <option value="Business">💼 Business</option>
+              <option value="School">🏫 School</option>
               <option value="Other">❓ Other</option>
             </select>
           </div>
+
+          <div class="form-group" id="subCategoryOtherGroup" style="display:none;">
+            <label for="subCategoryOther">Custom category</label>
+            <input type="text" id="subCategoryOther" placeholder="Enter a category name" />
+          </div>
+
+          <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;">
+            <button type="button" class="btn btn-outline" id="subStep1Back">Back</button>
+            <button type="button" class="btn" id="subStep1Next">Next</button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="subDate">Next Renewal Date *</label>
-          <input type="date" id="subDate" required />
+        <!-- STEP 2: Billing details -->
+        <div id="subStep2" class="sub-step hidden">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="billingCycle">Billing Cycle *</label>
+              <select id="billingCycle" required>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Bi-Monthly">Bi-Monthly</option>
+                <option value="Daily">Daily</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="subDate">Next Payment Date *</label>
+              <input type="date" id="subDate" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="subAmount">Cost Per Billing Cycle ($) *</label>
+            <input type="number" id="subAmount" placeholder="0.00" min="0" step="0.01" required />
+          </div>
+
+          <p class="form-error" id="subFormError" aria-live="polite"></p>
+
+          <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;gap:8px;">
+            <button type="button" class="btn btn-outline" id="subStep2Back">Back</button>
+            <button type="button" class="btn btn-outline" id="subStep2Cancel">Cancel</button>
+            <button type="submit" class="btn" style="flex:1;justify-content:center;">
+              ✓ Save Subscription
+            </button>
+          </div>
         </div>
-
-        <p class="form-error" id="subFormError" aria-live="polite"></p>
-
-        <button type="submit" class="btn" style="width:100%;justify-content:center;">
-          ✓ Add Subscription
-        </button>
       </form>
     </div>
   </div>
@@ -244,41 +279,69 @@
 
       <div class="modal-icon-header"></div>
       <h2 class="modal-title" id="trialFormTitle">Track a Free Trial</h2>
-      <p class="modal-subtitle" style="margin-bottom:16px;">Never forget to cancel — log your trial end date.</p>
-
-      <div class="trial-highlight">
-        We'll flag this trial as <strong>Ending Soon</strong> when it's within 5 days.
-      </div>
-      <br>
+      <p class="modal-subtitle" style="margin-bottom:16px;">Quickly capture the details of your free trial.</p>
       <form id="trialForm" novalidate>
 
-        <div class="form-group">
-          <label for="trialName">Service Name *</label>
-          <input type="text" id="trialName" placeholder="e.g. Disney+, Apple TV+…" required />
-        </div>
-
-        <div class="form-row">
+        <!-- STEP 1: Basic details -->
+        <div id="trialStep1" class="sub-step">
           <div class="form-group">
-            <label for="trialEndDate">Trial Ends On *</label>
-            <input type="date" id="trialEndDate" required />
+            <label for="trialName">Service Name *</label>
+            <input type="text" id="trialName" placeholder="e.g. Disney+, Apple TV+…" required />
           </div>
+
           <div class="form-group">
             <label for="trialCategory">Category</label>
             <select id="trialCategory">
               <option value="Entertainment">🎬 Entertainment</option>
               <option value="Productivity">📚 Productivity</option>
-              <option value="Utilities">💡 Utilities</option>
               <option value="Business">💼 Business</option>
+              <option value="School">🏫 School</option>
               <option value="Other">❓ Other</option>
             </select>
           </div>
+
+          <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;">
+            <button type="button" class="btn btn-outline" id="trialStep1Back">Back</button>
+            <button type="button" class="btn" id="trialStep1Next">Next</button>
+          </div>
         </div>
 
-        <p class="form-error" id="trialFormError" aria-live="polite"></p>
+        <!-- STEP 2: Billing details -->
+        <div id="trialStep2" class="sub-step hidden">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="trialBillingCycle">Billing Cycle *</label>
+              <select id="trialBillingCycle" required>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Bi-Monthly">Bi-Monthly</option>
+                <option value="Daily">Daily</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="trialEndDate">Free Trial End / Next Payment Date *</label>
+              <input type="date" id="trialEndDate" required />
+            </div>
+          </div>
 
-        <button type="submit" class="btn" style="width:100%;justify-content:center;background:rgba(96,165,250,0.9);color:#000;">
-          <strong>Track Trial</strong>
-        </button>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="trialCost">Cost Per Billing Cycle ($)</label>
+              <input type="number" id="trialCost" placeholder="0.00" min="0" step="0.01" />
+            </div>
+          </div>
+
+          <p class="form-error" id="trialFormError" aria-live="polite"></p>
+
+          <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;gap:8px;">
+            <button type="button" class="btn btn-outline" id="trialStep2Back">Back</button>
+            <button type="button" class="btn btn-outline" id="trialStep2Cancel">Cancel</button>
+            <button type="submit" class="btn" style="flex:1;justify-content:center;background:rgba(96,165,250,0.9);color:#000;">
+              <strong>Save Free Trial</strong>
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   </div>

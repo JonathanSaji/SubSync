@@ -3,9 +3,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // MODAL LOGIC
     // ==========================================
-    const addModalOverlay = document.getElementById("addModalOverlay");
+    const addModalOverlay  = document.getElementById("addModalOverlay");
     const subFormOverlay   = document.getElementById("subFormOverlay");
     const trialFormOverlay = document.getElementById("trialFormOverlay");
+
+    // Multi-step subscription form elements
+    const subForm          = document.getElementById("subForm");
+    const subStep1         = document.getElementById("subStep1");
+    const subStep2         = document.getElementById("subStep2");
+    const subStep1Next     = document.getElementById("subStep1Next");
+    const subStep1Back     = document.getElementById("subStep1Back");
+    const subStep2Back     = document.getElementById("subStep2Back");
+    const subStep2Cancel   = document.getElementById("subStep2Cancel");
+    const subCategorySelect = document.getElementById("subCategory");
+    const subCategoryOtherGroup = document.getElementById("subCategoryOtherGroup");
+
+    // Multi-step free trial form elements
+    const trialForm          = document.getElementById("trialForm");
+    const trialStep1         = document.getElementById("trialStep1");
+    const trialStep2         = document.getElementById("trialStep2");
+    const trialStep1Next     = document.getElementById("trialStep1Next");
+    const trialStep1Back     = document.getElementById("trialStep1Back");
+    const trialStep2Back     = document.getElementById("trialStep2Back");
+    const trialStep2Cancel   = document.getElementById("trialStep2Cancel");
 
     function openModal() {
         addModalOverlay.classList.add("visible");
@@ -24,8 +44,17 @@ document.addEventListener("DOMContentLoaded", () => {
         subFormOverlay.classList.add("visible");
         subFormOverlay.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
-        document.getElementById("subForm").reset();
-        document.getElementById("subFormError").textContent = "";
+        subForm?.reset();
+        const errorEl = document.getElementById("subFormError");
+        if (errorEl) errorEl.textContent = "";
+        // Reset to step 1 view whenever the form opens
+        if (subStep1 && subStep2) {
+            subStep1.classList.remove("hidden");
+            subStep2.classList.add("hidden");
+        }
+        if (subCategoryOtherGroup) {
+            subCategoryOtherGroup.style.display = "none";
+        }
     }
 
     function closeSubForm() {
@@ -39,8 +68,14 @@ document.addEventListener("DOMContentLoaded", () => {
         trialFormOverlay.classList.add("visible");
         trialFormOverlay.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
-        document.getElementById("trialForm").reset();
-        document.getElementById("trialFormError").textContent = "";
+        trialForm?.reset();
+        const errorEl = document.getElementById("trialFormError");
+        if (errorEl) errorEl.textContent = "";
+        // Reset to step 1 view whenever the form opens
+        if (trialStep1 && trialStep2) {
+            trialStep1.classList.remove("hidden");
+            trialStep2.classList.add("hidden");
+        }
     }
 
     function closeTrialForm() {
@@ -70,17 +105,72 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ==========================================
-    // SUBSCRIPTION FORM SUBMIT
+    // 1b. SUBSCRIPTION FORM STEP NAVIGATION
+    // ==========================================
+    function showSubStep(step) {
+        if (!subStep1 || !subStep2) return;
+        if (step === 1) {
+            subStep1.classList.remove("hidden");
+            subStep2.classList.add("hidden");
+        } else {
+            subStep1.classList.add("hidden");
+            subStep2.classList.remove("hidden");
+        }
+    }
+
+    subStep1Next?.addEventListener("click", () => {
+        const nameInput = document.getElementById("subName");
+        const name = nameInput ? nameInput.value.trim() : "";
+        if (!name) {
+            alert("Please enter a service name before continuing.");
+            return;
+        }
+        showSubStep(2);
+    });
+
+    subStep1Back?.addEventListener("click", () => {
+        closeSubForm();
+        openModal();
+    });
+
+    subStep2Back?.addEventListener("click", () => {
+        showSubStep(1);
+    });
+
+    subStep2Cancel?.addEventListener("click", () => {
+        closeSubForm();
+    });
+
+    // Show custom category input when "Other" is chosen
+    subCategorySelect?.addEventListener("change", () => {
+        if (!subCategoryOtherGroup) return;
+        if (subCategorySelect.value === "Other") {
+            subCategoryOtherGroup.style.display = "block";
+        } else {
+            subCategoryOtherGroup.style.display = "none";
+        }
+    });
+
+    // ==========================================
+    // 2. SUBSCRIPTION FORM SUBMIT
     // ==========================================
     document.getElementById("subForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name     = document.getElementById("subName").value.trim();
         const amount   = parseFloat(document.getElementById("subAmount").value);
-        const category = document.getElementById("subCategory").value;
+        const baseCategory = document.getElementById("subCategory").value;
+        const customCategoryInput = document.getElementById("subCategoryOther");
+        let category = baseCategory;
+        if (baseCategory === "Other" && customCategoryInput) {
+            const custom = customCategoryInput.value.trim();
+            if (custom) category = custom;
+        }
         const date     = document.getElementById("subDate").value;
+        const billingCycleSelect = document.getElementById("billingCycle");
+        const billingCycle = billingCycleSelect ? billingCycleSelect.value : "Monthly";
         const errorEl  = document.getElementById("subFormError");
 
-        if (!name || isNaN(amount) || !date) {
+        if (!name || isNaN(amount) || !date || !billingCycle) {
             errorEl.textContent = "Please fill in all required fields.";
             return;
         }
@@ -95,17 +185,22 @@ document.addEventListener("DOMContentLoaded", () => {
             Productivity:  'rgba(255,215,0,0.12)',
             Utilities:     'rgba(96,165,250,0.15)',
             Business:      'rgba(167,139,250,0.15)',
+            School:        'rgba(52,211,153,0.15)',
             Other:         'rgba(255,255,255,0.08)'
         };
+
+        const monthlyAmount = computeMonthlyAmount(amount, billingCycle);
 
         const newSub = {
             id:               Date.now(),
             name,
-            amount,
+            amount:           monthlyAmount,
             date,
             subscriptionType: category,
             color:            CATEGORY_COLORS[category] || CATEGORY_COLORS.Other,
-            isTrial:          false
+            isTrial:          false,
+            billingCycle,
+            amountPerCycle:   amount
         };
 
         const ok = await saveSubscription(newSub);
@@ -120,27 +215,75 @@ document.addEventListener("DOMContentLoaded", () => {
         closeSubForm();
     });
 
-    // =======================================
-    // FREE TRIAL FORM SUBMIT
-    // =======================================
-    document.getElementById("trialForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const name     = document.getElementById("trialName").value.trim();
-        const endDate  = document.getElementById("trialEndDate").value;
-        const cost     = document.getElementById("trialCost").value;
-        const category = document.getElementById("trialCategory").value;
-        const errorEl  = document.getElementById("trialFormError");
+    // ==========================================
+    // 3. FREE TRIAL FORM STEP NAV + SUBMIT
+    // ==========================================
 
-        if (!name || !endDate) {
-            errorEl.textContent = "Please fill in the service name and end date.";
+    function showTrialStep(step) {
+        if (!trialStep1 || !trialStep2) return;
+        if (step === 1) {
+            trialStep1.classList.remove("hidden");
+            trialStep2.classList.add("hidden");
+        } else {
+            trialStep1.classList.add("hidden");
+            trialStep2.classList.remove("hidden");
+        }
+    }
+
+    trialStep1Next?.addEventListener("click", () => {
+        const nameInput = document.getElementById("trialName");
+        const name = nameInput ? nameInput.value.trim() : "";
+        if (!name) {
+            alert("Please enter a service name before continuing.");
             return;
         }
+        showTrialStep(2);
+    });
+
+    trialStep1Back?.addEventListener("click", () => {
+        closeTrialForm();
+        openModal();
+    });
+
+    trialStep2Back?.addEventListener("click", () => {
+        showTrialStep(1);
+    });
+
+    trialStep2Cancel?.addEventListener("click", () => {
+        closeTrialForm();
+    });
+
+    document.getElementById("trialForm")?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name       = document.getElementById("trialName").value.trim();
+        const endDate    = document.getElementById("trialEndDate").value;
+        const costValue  = document.getElementById("trialCost").value;
+        const billingSel = document.getElementById("trialBillingCycle");
+        const billingCycle = billingSel ? billingSel.value : "Monthly";
+        const category   = document.getElementById("trialCategory").value;
+        const errorEl    = document.getElementById("trialFormError");
+
+        if (!name || !endDate || !billingCycle) {
+            errorEl.textContent = "Please fill in all required fields.";
+            return;
+        }
+
+        const cost = costValue ? parseFloat(costValue) : 0;
+        if (cost < 0) {
+            errorEl.textContent = "Cost must be a positive number.";
+            return;
+        }
+
+        const monthlyAmount = computeMonthlyAmount(cost, billingCycle);
 
         const newTrial = {
             id:               Date.now(),
             name,
-            amount:           cost ? parseFloat(cost) : 0,
-            date:             endDate,
+            amount:           monthlyAmount,
+            amountPerCycle:   cost,
+            date:             endDate,               // used for days-remaining
+            trialEndDate:     endDate,
+            billingCycle,
             subscriptionType: category,
             color:            'rgba(96,165,250,0.12)',
             isTrial:          true
@@ -417,35 +560,44 @@ function updateAllStats(){
             return acc;
         }, {});
 
-    // Calculate number of subscriptions per type (non-trial)
-    const categoryCounts = subscriptions
-        .filter(s => !s.isTrial)
-        .reduce((acc, s) => {
-            const type = s.subscriptionType || 'Other';
-            acc[type] = (acc[type] || 0) + 1;  // Count subscriptions instead of summing amounts
-            return acc;
-        }, {});
-
-    // Find the category with the highest number of subscriptions
-    const topCategory = Object.entries(categoryCounts).reduce((max, [type, count]) => 
-        count > max.count ? { type, count } : max, 
-        { type: 'None', count: 0 }
+    // Find the category with the highest total spend (by amount)
+    const topCategoryBySpend = Object.entries(categoryTotals).reduce(
+        (max, [type, amount]) => amount > max.amount ? { type, amount } : max,
+        { type: 'None', amount: 0 }
     );
 
-    // Update the top category stat (now showing count of subscriptions)
-    document.querySelectorAll('#topCategoryValue').forEach(el => {
-        el.textContent = topCategory.type === 'None' ? 'None' : topCategory.count + " subscriptions";
-    });
+    // Update the top category stat (category you spend the most on)
     document.querySelectorAll('#topCategorySub').forEach(el => {
-        el.textContent = topCategory.type === 'None' ? 'None' : topCategory.type;
+        el.textContent = topCategoryBySpend.type === 'None' ? 'None' : topCategoryBySpend.type;
+    });
+    document.querySelectorAll('#topCategoryValue').forEach(el => {
+        el.textContent = topCategoryBySpend.type === 'None' ? 'None' : '$' + topCategoryBySpend.amount.toFixed(2);
     });
     
     renderServiceSpendByService();
     renderPieChart();
+    renderFreeTrialsInsight();
 }
 
 function calculateTime(dateString){
     return Math.ceil((new Date(dateString) - new Date()) / (1000 * 60 * 60 * 24));
+}
+
+function computeMonthlyAmount(amountPerCycle, billingCycle) {
+    if (!amountPerCycle || isNaN(amountPerCycle)) return 0;
+    switch (billingCycle) {
+        case 'Weekly':
+            return amountPerCycle * (52 / 12);
+        case 'Yearly':
+            return amountPerCycle / 12;
+        case 'Bi-Monthly':
+            return amountPerCycle / 2;
+        case 'Daily':
+            return amountPerCycle * (365 / 12);
+        case 'Monthly':
+        default:
+            return amountPerCycle;
+    }
 }
 
 
@@ -489,26 +641,49 @@ function renderSubscriptions() { // Creates/ updates subscription list, dynamica
 
         //code for when trial/sub status
         if (sub.isTrial) {
-            if (daysRemaining < 0)      { statusClass = 'status-cancel'; statusText = 'Expired'; }
-            else if (daysRemaining <= 5) { statusClass = 'status-soon';   statusText = 'Ends Soon'; }
-            else                         { statusClass = 'status-ok';     statusText = 'Trial'; }
+            if (daysRemaining < 0) {
+                statusClass = 'status-cancel';
+                statusText  = 'Expired';
+            } else if (daysRemaining === 0) {
+                statusClass = 'status-cancel';
+                statusText  = 'Now';
+            } else if (daysRemaining <= 7) {
+                statusClass = 'status-soon';
+                statusText  = 'Soon';
+            } else if (sub.amount === 0) {
+                statusClass = 'status-ok';
+                statusText  = 'Free Trial';
+            } else {
+                statusClass = 'status-later';
+                statusText  = 'Later';
+            }
         } else {
-            if (daysRemaining === 0)    { statusClass = 'status-cancel'; statusText = 'Due'; }
-            else if (daysRemaining < 0) { statusClass = 'status-cancel'; statusText = 'Overdue'; }
-            else if (daysRemaining <= 7) { statusClass = 'status-soon';   statusText = 'Soon'; }
+            if (daysRemaining < 0) {
+                statusClass = 'status-cancel';
+                statusText  = 'Overdue';
+            } else if (daysRemaining === 0) {
+                statusClass = 'status-cancel';
+                statusText  = 'Now';
+            } else if (daysRemaining <= 7) {
+                statusClass = 'status-soon';
+                statusText  = 'Soon';
+            } else {
+                statusClass = 'status-later';
+                statusText  = 'Later';
+            }
         }
 
         const ICONS = { Entertainment: '🎬', Productivity: '📚', Utilities: '💡', Business: '💼' };
         //checking which button was clicked
         sub.icon = ICONS[sub.subscriptionType] || (sub.isTrial ? '⏳' : '❓');
 
-        const trialBadge = sub.isTrial
-            ? `<span style="font-size:0.68rem;background:rgba(96,165,250,0.18);color:#93c5fd;padding:2px 7px;border-radius:999px;margin-left:6px;font-weight:600;">TRIAL</span>`
-            : '';
-
         const amountDisplay = sub.isTrial && sub.amount === 0
             ? '<span style="color:var(--text-muted);font-size:0.8rem;">Free</span>'
             : `$${sub.amount.toFixed(2)}`;
+
+        const trialBadge = sub.isTrial
+            ? `<span class="trial-badge">Free Trial</span>`
+            : '';
 
         const item = document.createElement('div');
         item.className = 'table-row';
@@ -545,7 +720,95 @@ async function deleteSub(id) {
     }
 }
 
-// Visual #1 on insights page - spend by service, with bars 
+// ==========================================
+// INSIGHTS: CURRENT FREE TRIALS (by days remaining)
+// ==========================================
+
+function renderFreeTrialsInsight() {
+    const listEl = document.getElementById('freeTrialsList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '';
+
+    const trials = subscriptions.filter(s => s.isTrial);
+    if (!trials.length) {
+        listEl.innerHTML = '<div class="service-spend-empty">No free trials.</div>';
+        return;
+    }
+
+    const withDays = trials.map(sub => ({
+        ...sub,
+        daysRemaining: calculateTime(sub.date)
+    }));
+    withDays.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+    const maxDays = Math.max(1, ...withDays.map(t => Math.max(0, t.daysRemaining)));
+
+    withDays.forEach(trial => {
+        const days = trial.daysRemaining;
+        let daysLabel = days < 0 ? 'Expired' : days === 0 ? 'Today' : days + ' days left';
+        const barWidth = days < 0 ? 0 : Math.max(6, (days / maxDays) * 100);
+
+        const row = document.createElement('div');
+        row.className = 'service-spend-row';
+        row.innerHTML = `
+            <div class="service-spend-label">${trial.name || 'Unnamed'}</div>
+            <div class="service-spend-bar">
+                <div class="service-spend-bar-fill" style="width:${barWidth}%;"></div>
+            </div>
+            <div class="service-spend-amount">${daysLabel}</div>
+        `;
+        listEl.appendChild(row);
+    });
+}
+
+// ==========================================
+// INSIGHTS: MONTHLY SPEND BY SERVICE
+// ==========================================
+
+function renderServiceSpendByService() {
+    const listEl = document.getElementById('serviceSpendList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '';
+
+    const paidSubs = subscriptions.filter(s => !s.isTrial);
+
+    if (!paidSubs.length) {
+        listEl.innerHTML = '<div class="service-spend-empty">No paid subscriptions yet.</div>';
+        return;
+    }
+
+    const totalsByName = paidSubs.reduce((acc, sub) => {
+        const key = sub.name || 'Unnamed';
+        acc[key] = (acc[key] || 0) + (sub.amount || 0);
+        return acc;
+    }, {});
+
+    const entries = Object.entries(totalsByName);
+    entries.sort((a, b) => b[1] - a[1]);
+
+    const maxAmount = entries[0] ? entries[0][1] || 1 : 1;
+
+    entries.forEach(([name, amount]) => {
+        const percentage = Math.max(6, (amount / maxAmount) * 100);
+        const row = document.createElement('div');
+        row.className = 'service-spend-row';
+        row.innerHTML = `
+            <div class="service-spend-label">${name}</div>
+            <div class="service-spend-bar">
+                <div class="service-spend-bar-fill" style="width:${percentage}%;"></div>
+            </div>
+            <div class="service-spend-amount">$${amount.toFixed(2)}</div>
+        `;
+        listEl.appendChild(row);
+    });
+}
+
+// ==========================================
+// INSIGHTS: MONTHLY SPEND BY SERVICE
+// ==========================================
+
 function renderServiceSpendByService() {
     const listEl = document.getElementById('serviceSpendList');
     const previewEl = document.getElementById('insightsTopServices');
