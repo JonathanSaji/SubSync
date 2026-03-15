@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": 1773586607614,
+    "name": "netflix",
+    "amount": 1000,
+    "date": "2026-03-17",
+    "subscriptionType": "Entertainment",
+    "color": "rgba(229,9,20,0.15)",
+    "isTrial": false,
+    "billingCycle": "Monthly",
+    "amountPerCycle": 1000,
+    "personalValue": 10
+  }
+]

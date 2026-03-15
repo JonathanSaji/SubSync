@@ -11,10 +11,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const subForm          = document.getElementById("subForm");
     const subStep1         = document.getElementById("subStep1");
     const subStep2         = document.getElementById("subStep2");
+    const subStep3         = document.getElementById("subStep3");
     const subStep1Next     = document.getElementById("subStep1Next");
     const subStep1Back     = document.getElementById("subStep1Back");
     const subStep2Back     = document.getElementById("subStep2Back");
-    const subStep2Cancel   = document.getElementById("subStep2Cancel");
+    const subStep2Next     = document.getElementById("subStep2Next");
+    const subStep3Back     = document.getElementById("subStep3Back");
+    const subStep3Cancel   = document.getElementById("subStep3Cancel");
+    const subValueInput    = document.getElementById("subValue");
+    const subValueLabel    = document.getElementById("subValueLabel");
     const subCategorySelect = document.getElementById("subCategory");
     const subCategoryOtherGroup = document.getElementById("subCategoryOtherGroup");
 
@@ -48,9 +53,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const errorEl = document.getElementById("subFormError");
         if (errorEl) errorEl.textContent = "";
         // Reset to step 1 view whenever the form opens
-        if (subStep1 && subStep2) {
+        if (subStep1 && subStep2 && subStep3) {
             subStep1.classList.remove("hidden");
             subStep2.classList.add("hidden");
+            subStep3.classList.add("hidden");
         }
         if (subCategoryOtherGroup) {
             subCategoryOtherGroup.style.display = "none";
@@ -108,14 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1b. SUBSCRIPTION FORM STEP NAVIGATION
     // ==========================================
     function showSubStep(step) {
-        if (!subStep1 || !subStep2) return;
-        if (step === 1) {
-            subStep1.classList.remove("hidden");
-            subStep2.classList.add("hidden");
-        } else {
-            subStep1.classList.add("hidden");
-            subStep2.classList.remove("hidden");
-        }
+        if (!subStep1 || !subStep2 || !subStep3) return;
+        subStep1.classList.add("hidden");
+        subStep2.classList.add("hidden");
+        subStep3.classList.add("hidden");
+
+        if (step === 1) subStep1.classList.remove("hidden");
+        else if (step === 2) subStep2.classList.remove("hidden");
+        else if (step === 3) subStep3.classList.remove("hidden");
     }
 
     subStep1Next?.addEventListener("click", () => {
@@ -137,9 +143,33 @@ document.addEventListener("DOMContentLoaded", () => {
         showSubStep(1);
     });
 
-    subStep2Cancel?.addEventListener("click", () => {
+    subStep2Next?.addEventListener("click", () => {
+        showSubStep(3);
+    });
+
+    subStep3Back?.addEventListener("click", () => {
+        showSubStep(2);
+    });
+
+    subStep3Cancel?.addEventListener("click", () => {
         closeSubForm();
     });
+
+    // Personal value slider live label & color
+    if (subValueInput && subValueLabel) {
+        const updateSliderUi = () => {
+            const val = parseInt(subValueInput.value || "5", 10);
+            subValueLabel.textContent = `${val} / 10`;
+            const t = (val - 1) / 9; // 0 at 1, 1 at 10
+            const r = Math.round(255 * (1 - t));
+            const g = Math.round(255 * t);
+            const color = `rgb(${r},${g},80)`;
+            subValueInput.style.setProperty('--track-color', color);
+            subValueLabel.style.color = color;
+        };
+        subValueInput.addEventListener('input', updateSliderUi);
+        updateSliderUi();
+    }
 
     // Show custom category input when "Other" is chosen
     subCategorySelect?.addEventListener("change", () => {
@@ -169,6 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const billingCycleSelect = document.getElementById("billingCycle");
         const billingCycle = billingCycleSelect ? billingCycleSelect.value : "Monthly";
         const errorEl  = document.getElementById("subFormError");
+        const personalValueInput = document.getElementById("subValue");
 
         if (!name || isNaN(amount) || !date || !billingCycle) {
             errorEl.textContent = "Please fill in all required fields.";
@@ -178,6 +209,8 @@ document.addEventListener("DOMContentLoaded", () => {
             errorEl.textContent = "Amount must be a positive number.";
             return;
         }
+
+        const personalValue = personalValueInput ? parseInt(personalValueInput.value || "5", 10) : 5;
 
         //made by ai
         const CATEGORY_COLORS = {
@@ -200,7 +233,8 @@ document.addEventListener("DOMContentLoaded", () => {
             color:            CATEGORY_COLORS[category] || CATEGORY_COLORS.Other,
             isTrial:          false,
             billingCycle,
-            amountPerCycle:   amount
+            amountPerCycle:   amount,
+            personalValue:    personalValue
         };
 
         const ok = await saveSubscription(newSub);
@@ -575,6 +609,7 @@ function updateAllStats(){
     });
     
     renderServiceSpendByService();
+    renderPersonalValueInsight();
     renderPieChart();
     renderFreeTrialsInsight();
 }
@@ -864,6 +899,42 @@ function renderServiceSpendByService() {
             previewEl.appendChild(item);
         });
     }
+}
+
+// ==========================================
+// INSIGHTS: PERSONAL VALUE BY SERVICE
+// ==========================================
+
+function renderPersonalValueInsight() {
+    const listEl = document.getElementById('personalValueList');
+    if (!listEl) return;
+
+    listEl.innerHTML = '';
+
+    const paidSubs = subscriptions.filter(s => !s.isTrial);
+    if (!paidSubs.length) {
+        listEl.innerHTML = '<div class="service-spend-empty">No personal values yet.</div>';
+        return;
+    }
+
+    paidSubs.forEach(sub => {
+        const value = typeof sub.personalValue === 'number' ? sub.personalValue : 5;
+        const t = (value - 1) / 9;
+        const r = Math.round(255 * (1 - t));
+        const g = Math.round(255 * t);
+        const color = `rgb(${r},${g},80)`;
+
+        const row = document.createElement('div');
+        row.className = 'service-spend-row';
+        row.innerHTML = `
+            <div class="service-spend-label">${sub.name}</div>
+            <div class="service-spend-bar value-bar">
+                <div class="service-spend-bar-fill" style="width:${(value / 10) * 100}%;background:${color};box-shadow:0 0 12px ${color};"></div>
+            </div>
+            <div class="service-spend-amount">${value}/10</div>
+        `;
+        listEl.appendChild(row);
+    });
 }
 
 // ==========================================

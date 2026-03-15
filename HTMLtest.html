@@ -111,6 +111,14 @@
             <!-- Filled dynamically from subscriptions -->
           </div>
         </div>
+        <div class="service-spend-card">
+          <div class="service-spend-header">
+            <span class="service-spend-title">Personal Value by Service</span>
+          </div>
+          <div id="personalValueList" class="service-spend-list">
+            <!-- Filled dynamically from subscriptions -->
+          </div>
+        </div>
         <div class="service-spend-card service-spend-card--grows">
           <div class="service-spend-header">
             <span class="service-spend-title">Current Free Trials</span>
@@ -234,8 +242,26 @@
           </div>
         </div>
 
-        <!-- STEP 2: Billing details -->
+        <!-- STEP 2: Personal value slider -->
         <div id="subStep2" class="sub-step hidden">
+          <div class="form-group">
+            <label for="subValue">How valuable/useful is this to you? (1–10)</label>
+            <div class="value-slider-row">
+              <input type="range" id="subValue" min="1" max="10" value="5" />
+              <span id="subValueLabel" class="value-slider-label">5 / 10</span>
+            </div>
+          </div>
+
+          <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;gap:8px;">
+            <button type="button" class="btn btn-outline" id="subStep2Back">Back</button>
+            <button type="button" class="btn" id="subStep2Next" style="flex:1;justify-content:center;">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Billing details & save -->
+        <div id="subStep3" class="sub-step hidden">
           <div class="form-row">
             <div class="form-group">
               <label for="billingCycle">Billing Cycle *</label>
@@ -261,8 +287,8 @@
           <p class="form-error" id="subFormError" aria-live="polite"></p>
 
           <div class="form-actions-row" style="display:flex;justify-content:space-between;margin-top:20px;gap:8px;">
-            <button type="button" class="btn btn-outline" id="subStep2Back">Back</button>
-            <button type="button" class="btn btn-outline" id="subStep2Cancel">Cancel</button>
+            <button type="button" class="btn btn-outline" id="subStep3Back">Back</button>
+            <button type="button" class="btn btn-outline" id="subStep3Cancel">Cancel</button>
             <button type="submit" class="btn" style="flex:1;justify-content:center;">
               ✓ Save Subscription
             </button>

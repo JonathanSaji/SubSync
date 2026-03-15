@@ -132,8 +132,11 @@ const subscriptionText = subscriptions
     const category = sub.subscriptionType ?? "Other";
     const trialStatus = sub.isTrial ? "Trial" : "Paid";
     const trialEnd = sub.trialEndDate ? ` Trial ends ${sub.trialEndDate}.` : "";
+    const personalValue = typeof sub.personalValue === 'number'
+      ? ` User personal value rating ${sub.personalValue} out of 10.`
+      : "";
 
-    return `${sub.name} is a ${category} subscription, status ${trialStatus}. It costs $${cycleCost} per ${cycle} cycle (about $${monthlyCost}/month). Next billing date ${nextBilling}.${trialEnd}`;
+    return `${sub.name} is a ${category} subscription, status ${trialStatus}. It costs $${cycleCost} per ${cycle} cycle (about $${monthlyCost}/month). Next billing date ${nextBilling}.${trialEnd}${personalValue}`;
   })
   .join(" ");
 
