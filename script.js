@@ -3,34 +3,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // MODAL LOGIC
     // ==========================================
-    const addModalOverlay  = document.getElementById("addModalOverlay");
-    const subFormOverlay   = document.getElementById("subFormOverlay");
+    const addModalOverlay = document.getElementById("addModalOverlay");
+    const subFormOverlay = document.getElementById("subFormOverlay");
     const trialFormOverlay = document.getElementById("trialFormOverlay");
 
     // Multi-step subscription form elements
-    const subForm          = document.getElementById("subForm");
-    const subStep1         = document.getElementById("subStep1");
-    const subStep2         = document.getElementById("subStep2");
-    const subStep3         = document.getElementById("subStep3");
-    const subStep1Next     = document.getElementById("subStep1Next");
-    const subStep1Back     = document.getElementById("subStep1Back");
-    const subStep2Back     = document.getElementById("subStep2Back");
-    const subStep2Next     = document.getElementById("subStep2Next");
-    const subStep3Back     = document.getElementById("subStep3Back");
-    const subStep3Cancel   = document.getElementById("subStep3Cancel");
-    const subValueInput    = document.getElementById("subValue");
-    const subValueLabel    = document.getElementById("subValueLabel");
+    const subForm = document.getElementById("subForm");
+    const subStep1 = document.getElementById("subStep1");
+    const subStep2 = document.getElementById("subStep2");
+    const subStep3 = document.getElementById("subStep3");
+    const subStep1Next = document.getElementById("subStep1Next");
+    const subStep1Back = document.getElementById("subStep1Back");
+    const subStep2Back = document.getElementById("subStep2Back");
+    const subStep2Next = document.getElementById("subStep2Next");
+    const subStep3Back = document.getElementById("subStep3Back");
+    const subStep3Cancel = document.getElementById("subStep3Cancel");
+    const subValueInput = document.getElementById("subValue");
+    const subValueLabel = document.getElementById("subValueLabel");
     const subCategorySelect = document.getElementById("subCategory");
     const subCategoryOtherGroup = document.getElementById("subCategoryOtherGroup");
 
     // Multi-step free trial form elements
-    const trialForm          = document.getElementById("trialForm");
-    const trialStep1         = document.getElementById("trialStep1");
-    const trialStep2         = document.getElementById("trialStep2");
-    const trialStep1Next     = document.getElementById("trialStep1Next");
-    const trialStep1Back     = document.getElementById("trialStep1Back");
-    const trialStep2Back     = document.getElementById("trialStep2Back");
-    const trialStep2Cancel   = document.getElementById("trialStep2Cancel");
+    const trialForm = document.getElementById("trialForm");
+    const trialStep1 = document.getElementById("trialStep1");
+    const trialStep2 = document.getElementById("trialStep2");
+    const trialStep1Next = document.getElementById("trialStep1Next");
+    const trialStep1Back = document.getElementById("trialStep1Back");
+    const trialStep2Back = document.getElementById("trialStep2Back");
+    const trialStep2Cancel = document.getElementById("trialStep2Cancel");
 
     function openModal() {
         addModalOverlay.classList.add("visible");
@@ -186,8 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     document.getElementById("subForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const name     = document.getElementById("subName").value.trim();
-        const amount   = parseFloat(document.getElementById("subAmount").value);
+        const name = document.getElementById("subName").value.trim();
+        const amount = parseFloat(document.getElementById("subAmount").value);
         const baseCategory = document.getElementById("subCategory").value;
         const customCategoryInput = document.getElementById("subCategoryOther");
         let category = baseCategory;
@@ -195,10 +195,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const custom = customCategoryInput.value.trim();
             if (custom) category = custom;
         }
-        const date     = document.getElementById("subDate").value;
+        const date = document.getElementById("subDate").value;
         const billingCycleSelect = document.getElementById("billingCycle");
         const billingCycle = billingCycleSelect ? billingCycleSelect.value : "Monthly";
-        const errorEl  = document.getElementById("subFormError");
+        const errorEl = document.getElementById("subFormError");
         const personalValueInput = document.getElementById("subValue");
 
         if (!name || isNaN(amount) || !date || !billingCycle) {
@@ -215,26 +215,26 @@ document.addEventListener("DOMContentLoaded", () => {
         //made by ai
         const CATEGORY_COLORS = {
             Entertainment: 'rgba(229,9,20,0.15)',
-            Productivity:  'rgba(255,215,0,0.12)',
-            Utilities:     'rgba(96,165,250,0.15)',
-            Business:      'rgba(167,139,250,0.15)',
-            School:        'rgba(52,211,153,0.15)',
-            Other:         'rgba(255,255,255,0.08)'
+            Productivity: 'rgba(255,215,0,0.12)',
+            Utilities: 'rgba(96,165,250,0.15)',
+            Business: 'rgba(167,139,250,0.15)',
+            School: 'rgba(52,211,153,0.15)',
+            Other: 'rgba(255,255,255,0.08)'
         };
 
         const monthlyAmount = computeMonthlyAmount(amount, billingCycle);
 
         const newSub = {
-            id:               Date.now(),
+            id: Date.now(),
             name,
-            amount:           monthlyAmount,
+            amount: monthlyAmount,
             date,
             subscriptionType: category,
-            color:            CATEGORY_COLORS[category] || CATEGORY_COLORS.Other,
-            isTrial:          false,
+            color: CATEGORY_COLORS[category] || CATEGORY_COLORS.Other,
+            isTrial: false,
             billingCycle,
-            amountPerCycle:   amount,
-            personalValue:    personalValue
+            amountPerCycle: amount,
+            personalValue: personalValue
         };
 
         const ok = await saveSubscription(newSub);
@@ -289,13 +289,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("trialForm")?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const name       = document.getElementById("trialName").value.trim();
-        const endDate    = document.getElementById("trialEndDate").value;
-        const costValue  = document.getElementById("trialCost").value;
+        const name = document.getElementById("trialName").value.trim();
+        const endDate = document.getElementById("trialEndDate").value;
+        const costValue = document.getElementById("trialCost").value;
         const billingSel = document.getElementById("trialBillingCycle");
         const billingCycle = billingSel ? billingSel.value : "Monthly";
-        const category   = document.getElementById("trialCategory").value;
-        const errorEl    = document.getElementById("trialFormError");
+        const category = document.getElementById("trialCategory").value;
+        const errorEl = document.getElementById("trialFormError");
 
         if (!name || !endDate || !billingCycle) {
             errorEl.textContent = "Please fill in all required fields.";
@@ -311,16 +311,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const monthlyAmount = computeMonthlyAmount(cost, billingCycle);
 
         const newTrial = {
-            id:               Date.now(),
+            id: Date.now(),
             name,
-            amount:           monthlyAmount,
-            amountPerCycle:   cost,
-            date:             endDate,               // used for days-remaining
-            trialEndDate:     endDate,
+            amount: monthlyAmount,
+            amountPerCycle: cost,
+            date: endDate,               // used for days-remaining
+            trialEndDate: endDate,
             billingCycle,
             subscriptionType: category,
-            color:            'rgba(96,165,250,0.12)',
-            isTrial:          true
+            color: 'rgba(96,165,250,0.12)',
+            isTrial: true
         };
 
         const ok = await saveSubscription(newTrial);
@@ -338,19 +338,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // LOGIN LOGIC
     // ==========================================
-    
+
     //const VALID_USERS = { user1: "pass1", user2: "pass2" }; //replace with .env values for security
-    
+
 
     let currentUser = null;
 
-    const loginOverlay    = document.getElementById("loginOverlay");
-    const loginForm       = document.getElementById("loginForm");
-    const loginUsername   = document.getElementById("loginUsername");
-    const loginPassword   = document.getElementById("loginPassword");
-    const loginError      = document.getElementById("loginError");
+    const loginOverlay = document.getElementById("loginOverlay");
+    const loginForm = document.getElementById("loginForm");
+    const loginUsername = document.getElementById("loginUsername");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginError = document.getElementById("loginError");
     const currentUserLabel = document.getElementById("currentUserLabel");
-    const logoutBtn       = document.getElementById("logoutBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
 
     // Update UI based on auth state
     const updateAuthUi = () => {
@@ -375,33 +375,43 @@ document.addEventListener("DOMContentLoaded", () => {
         if (loginPassword) loginPassword.value = "";
         if (loginError) loginError.textContent = "";
         updateAuthUi();
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen();
+        }
     });
 
     loginForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const username = loginUsername?.value.trim();
-    const password = loginPassword?.value;
-    if (!username || !password) return;
+        e.preventDefault();
+        const username = loginUsername?.value.trim();
+        const password = loginPassword?.value;
+        if (!username || !password) return;
 
-    try {
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (data.success) {
-            currentUser = data.user;
-            loginError.textContent = '';
-            updateAuthUi();
-            loadSubscriptionsFromServer();
-        } else {
-            loginError.textContent = 'Invalid username or password.';
-        }
+        try {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                currentUser = data.user;
+                loginError.textContent = '';
+                updateAuthUi();
+                loadSubscriptions();
+
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.warn('Fullscreen request failed:', err);
+                    });
+                }
+
+            } else {
+                loginError.textContent = 'Invalid username or password.';
+            }
         } catch (err) {
-        console.error(err);
-        loginError.textContent = 'Error connecting to server.';
-    }
+            console.error(err);
+            loginError.textContent = 'Error connecting to server.';
+        }
     });
 
     // ==========================================
@@ -445,24 +455,24 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: text })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.answer) {
-                const msg = document.createElement("div");
-                msg.className = "ai-message ai";
-                aiMessages.appendChild(msg);
-                typeMessage(data.answer, msg, 15);
-            } else {
-                const msg = document.createElement("div");
-                msg.className = "ai-message ai";
-                aiMessages.appendChild(msg);
-                typeMessage("Error: No response from AI.", msg, 15);
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            addMessage("Error contacting AI server.", "ai");
-        });
+            .then(res => res.json())
+            .then(data => {
+                if (data.answer) {
+                    const msg = document.createElement("div");
+                    msg.className = "ai-message ai";
+                    aiMessages.appendChild(msg);
+                    typeMessage(data.answer, msg, 15);
+                } else {
+                    const msg = document.createElement("div");
+                    msg.className = "ai-message ai";
+                    aiMessages.appendChild(msg);
+                    typeMessage("Error: No response from AI.", msg, 15);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                addMessage("Error contacting AI server.", "ai");
+            });
     }
 
     aiSendBtn?.addEventListener("click", sendChat);
@@ -490,19 +500,19 @@ async function loadSubscriptions() {
     updateAllStats();
 }
 
-      if (window.location.hash === '#ai-advisor') {
+if (window.location.hash === '#ai-advisor') {
     if (typeof openAiAdvisor === 'function') {
-      openAiAdvisor();
+        openAiAdvisor();
     } else {
-      // Manually show the chatbox element
-      const aiTab = document.getElementById('ai-advisor-tab');
-      const aiContent = document.getElementById('ai-advisor-content');
-      if (aiTab) aiTab.classList.add('active'); // or whatever your tab uses
-      if (aiContent) aiContent.style.display = 'block'; // or your show method
+        // Manually show the chatbox element
+        const aiTab = document.getElementById('ai-advisor-tab');
+        const aiContent = document.getElementById('ai-advisor-content');
+        if (aiTab) aiTab.classList.add('active'); // or whatever your tab uses
+        if (aiContent) aiContent.style.display = 'block'; // or your show method
     }
-  }
+}
 
-  // Loading and saving from the json file
+// Loading and saving from the json file
 async function saveSubscription(sub) {
     try {
         const res = await fetch('/api/subscriptions', {
@@ -545,7 +555,7 @@ function switchPage(pageId, clickedButton) {
 }
 
 // Updates all the variable dependant components shown on html
-function updateAllStats(){
+function updateAllStats() {
     const total = subscriptions
         .filter(s => !s.isTrial)
         .reduce((sum, s) => sum + s.amount, 0);
@@ -607,14 +617,14 @@ function updateAllStats(){
     document.querySelectorAll('#topCategoryValue').forEach(el => {
         el.textContent = topCategoryBySpend.type === 'None' ? 'None' : '$' + topCategoryBySpend.amount.toFixed(2);
     });
-    
+
     renderServiceSpendByService();
     renderPersonalValueInsight();
     renderPieChart();
     renderFreeTrialsInsight();
 }
 
-function calculateTime(dateString){
+function calculateTime(dateString) {
     return Math.ceil((new Date(dateString) - new Date()) / (1000 * 60 * 60 * 24));
 }
 
@@ -667,44 +677,44 @@ function renderSubscriptions() { // Creates/ updates subscription list, dynamica
         }
 
         let daysRemainingDisplay = daysRemaining + " days";
-        if (daysRemaining === 0){
+        if (daysRemaining === 0) {
             daysRemainingDisplay = "Today";
         }
 
         let statusClass = 'status-ok';
-        let statusText  = 'Active';
+        let statusText = 'Active';
 
         //code for when trial/sub status
         if (sub.isTrial) {
             if (daysRemaining < 0) {
                 statusClass = 'status-cancel';
-                statusText  = 'Expired';
+                statusText = 'Expired';
             } else if (daysRemaining === 0) {
                 statusClass = 'status-cancel';
-                statusText  = 'Now';
+                statusText = 'Now';
             } else if (daysRemaining <= 7) {
                 statusClass = 'status-soon';
-                statusText  = 'Soon';
+                statusText = 'Soon';
             } else if (sub.amount === 0) {
                 statusClass = 'status-ok';
-                statusText  = 'Free Trial';
+                statusText = 'Free Trial';
             } else {
                 statusClass = 'status-later';
-                statusText  = 'Later';
+                statusText = 'Later';
             }
         } else {
             if (daysRemaining < 0) {
                 statusClass = 'status-cancel';
-                statusText  = 'Overdue';
+                statusText = 'Overdue';
             } else if (daysRemaining === 0) {
                 statusClass = 'status-cancel';
-                statusText  = 'Now';
+                statusText = 'Now';
             } else if (daysRemaining <= 7) {
                 statusClass = 'status-soon';
-                statusText  = 'Soon';
+                statusText = 'Soon';
             } else {
                 statusClass = 'status-later';
-                statusText  = 'Later';
+                statusText = 'Later';
             }
         }
 
@@ -966,10 +976,10 @@ function renderPieChart() {
 
     const COLOR_MAP = {
         Entertainment: '#e59f3b',
-        Productivity:  '#22c55e',
-        Utilities:     '#38bdf8',
-        Business:      '#a855f7',
-        Other:         '#6b7280'
+        Productivity: '#22c55e',
+        Utilities: '#38bdf8',
+        Business: '#a855f7',
+        Other: '#6b7280'
     };
 
     const backgroundColors = labels.map(label => COLOR_MAP[label] || COLOR_MAP.Other);
