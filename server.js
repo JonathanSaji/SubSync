@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { sendEmailReminders } = require('./emailReminders');
 
 require("dotenv").config({ quiet: true });
 const OpenAI = require("openai");
@@ -15,6 +16,15 @@ app.use(cors());
 app.use(express.json());
 
 
+const emailsPath = path.join(__dirname, 'data', 'emails.json');
+const emailsSentPath = path.join(__dirname, 'data', 'emailsSent.json');
+const subscriptionsPath = path.join(__dirname, 'data', 'subscriptions.json');
+
+// Reset emails and sent records on server start
+fs.writeFileSync(emailsPath, JSON.stringify([], null, 2), 'utf-8');
+fs.writeFileSync(emailsSentPath, JSON.stringify([], null, 2), 'utf-8');
+fs.writeFileSync(subscriptionsPath, JSON.stringify([], null, 2), 'utf-8');
+console.log('emails.json, emailsSent.json, and subscriptions.json have been reset on server start');
 
 // Serve static frontend files from the project root
 app.use(express.static(path.join(__dirname)));
@@ -35,6 +45,14 @@ const VALID_USERS = {
   [process.env.USER1_NAME]: process.env.USER1_PASS,
   [process.env.USER2_NAME]: process.env.USER2_PASS
 };
+
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
 // Login endpoint
 app.post('/api/login', (req, res) => {
@@ -84,6 +102,7 @@ app.get('/api/subscriptions', (req, res) => {
 app.post('/api/subscriptions', (req, res) => {
   const sub = req.body;
   if (!sub.name) return res.status(400).json({ error: 'name required' });
+  sub.name = capitalizeWords(sub.name);
   subscriptions.push(sub);
   persist();
   res.status(201).json(sub);
@@ -163,7 +182,8 @@ const subscriptionText = subscriptions
 
 
 
-const emailsPath = path.join(__dirname, 'data', 'emails.json');
+//const emailsPath = path.join(__dirname, 'data', 'emails.json');
+//const emailsSentPath = path.join(__dirname, 'data', 'emailsSent.json');
 
 // ensure emails.json exists
 if (!fs.existsSync(emailsPath)) {
@@ -173,6 +193,18 @@ if (!fs.existsSync(emailsPath)) {
 app.post('/subscribe', (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
+
+    // Special reset keyword
+  if (email.toLowerCase() === 'resetemails') {
+    console.log('Resetting emails.json to empty array');
+    fs.writeFileSync(emailsPath, JSON.stringify([], null, 2), 'utf-8');
+    return res.json({ success: true, message: 'emails.json has been reset' });
+  }
+
+  if (email.toLowerCase() === 'resetsent') {
+  fs.writeFileSync(emailsSentPath, JSON.stringify([], null, 2), 'utf-8');
+  return res.json({ success: true, message: 'emailsSent.json reset' });
+  }
 
   let emails = [];
   try {
@@ -187,7 +219,15 @@ app.post('/subscribe', (req, res) => {
   }
 
   res.json({ success: true });
+
 });
+
+// Run every hour (1000 ms * 60 sec * 60 min)
+setInterval(() => {
+  sendEmailReminders()
+    .then(() => console.log("Email check done"))
+    .catch(err => console.error("Email check failed:", err));
+}, 10000); // 10 sec
 
 
 
