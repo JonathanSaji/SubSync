@@ -46,6 +46,17 @@ const VALID_USERS = {
   [process.env.USER2_NAME]: process.env.USER2_PASS
 };
 
+const { Pool } = require("pg");
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+module.exports = pool;
+
 function capitalizeWords(str) {
   return str
     .toLowerCase()
