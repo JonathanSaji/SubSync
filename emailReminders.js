@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 
-const subscriptionsPath = path.join('./data', 'subscriptions.json');
 const emailsPath = path.join('./data', 'emails.json');       // array of emails
 const emailsSentPath = path.join('./data', 'emailsSent.json'); // array of {subId, email}
 
@@ -17,6 +16,18 @@ function readJSON(filePath) {
 // Helper: write JSON file
 function writeJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function normalizeSubscriptionRow(row) {
+  return {
+    ...row,
+    id: Number(row.id),
+    amount: Number(row.amount ?? 0),
+    amountPerCycle: Number(row.amountPerCycle ?? 0),
+    personalValue: row.personalValue === null || row.personalValue === undefined || row.personalValue === ''
+      ? null
+      : Number(row.personalValue)
+  };
 }
 
 // Calculate next renewal date based on start date & billing cycle
@@ -38,8 +49,25 @@ function getNextRenewalDate(startDateStr, billingCycle) {
 }
 
 // Main email sending function
-async function sendEmailReminders() {
-  const subscriptions = readJSON(subscriptionsPath);
+async function sendEmailReminders(pool) {
+  let subscriptions = [];
+  
+  // Fetch subscriptions from database if pool is provided
+  if (pool) {
+    try {
+      const result = await pool.query('SELECT * FROM subscriptions');
+      subscriptions = result.rows.map(normalizeSubscriptionRow);
+      console.log(`Email reminders loaded ${subscriptions.length} subscriptions from DB`);
+    } catch (err) {
+      console.error('Failed to fetch subscriptions from database:', err.message);
+      return;
+    }
+  } else {
+    // Fallback if pool not provided (backward compatibility)
+    console.error('sendEmailReminders called without pool parameter');
+    return;
+  }
+  
   const emails = readJSON(emailsPath);                 // ["user@email.com", ...]
   const emailsSent = readJSON(emailsSentPath);        // [{subId, email}, ...]
 

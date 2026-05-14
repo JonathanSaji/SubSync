@@ -238,12 +238,13 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
+        console.log('Saving subscription:', newSub);
         const savedSub = await saveSubscription(newSub); // calls your new function
-        subscriptions.push(savedSub);                     // push the server-modified object
-        renderSubscriptions();
-        updateAllStats();
+        console.log('Server save response:', savedSub);
+        await loadSubscriptions();
         closeSubForm();
         } catch (err) {
+            console.error('Subscription save failed:', err);
             errorEl.textContent = "Failed to save. Is the server running?";
         }
             });
@@ -334,12 +335,17 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(newTrial)
         });
 
+        console.log('Saving trial subscription:', newTrial);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('Trial save failed:', res.status, errorText);
+            throw new Error(`Server responded with ${res.status}`);
+        }
+
         const savedTrial = await res.json();
-
-
-        subscriptions.push(savedTrial);
-        renderSubscriptions();
-        updateAllStats();
+        console.log('Server trial save response:', savedTrial);
+        await loadSubscriptions();
         closeTrialForm();
     });
 
@@ -549,6 +555,7 @@ async function loadSubscriptions() {
     try {
         const res = await fetch('/api/subscriptions');
         subscriptions = await res.json();
+        console.log('Loaded subscriptions from server:', subscriptions);
     } catch (err) {
         console.warn('Could not load from server:', err);
         subscriptions = [];
@@ -611,6 +618,7 @@ async function saveSubscription(sub) {
 code messing things up worse bruh */ 
 
 async function saveSubscription(sub) {
+    console.log('POST /api/subscriptions request:', sub);
     const res = await fetch('/api/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -618,10 +626,14 @@ async function saveSubscription(sub) {
     });
 
     if (!res.ok) {
+        const errorText = await res.text();
+        console.error('POST /api/subscriptions failed:', res.status, errorText);
         throw new Error(`Server responded with ${res.status}`);
     }
 
-    return await res.json();
+    const saved = await res.json();
+    console.log('POST /api/subscriptions response:', saved);
+    return saved;
 }
 
 
