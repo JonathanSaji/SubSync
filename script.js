@@ -1,9 +1,35 @@
+// ==========================================
+// GLOBAL VARIABLES
+// ==========================================
+let currentUser = null;
+let currentUserId = null;
+
+// Event logging function (global scope so it can be used from anywhere)
+const logEvent = async (eventType, eventName, details = {}) => {
+    console.log(`[${eventType}] ${eventName}`, details);
+    try {
+        await fetch('/api/log-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ eventType, eventName, details })
+        });
+    } catch (err) {
+        console.error('Failed to log event:', err);
+    }
+};
+
 // Ensures Site is loaded before running any scripts
 document.addEventListener("DOMContentLoaded", () => {
+
     // ==========================================
     // MODAL LOGIC
     // ==========================================
+    const secretConsoleBtn = document.getElementById("secretConsoleBtn");
     const addModalOverlay = document.getElementById("addModalOverlay");
+    const adminConsoleOverlay = document.getElementById("adminConsoleOverlay");
+    const adminConsoleForm = document.getElementById("adminConsoleForm");
+    const adminConsoleInput = document.getElementById("adminConsoleInput");
+    const adminConsoleOutput = document.getElementById("adminConsoleOutput");
     const subFormOverlay = document.getElementById("subFormOverlay");
     const trialFormOverlay = document.getElementById("trialFormOverlay");
 
@@ -31,6 +57,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const trialStep1Back = document.getElementById("trialStep1Back");
     const trialStep2Back = document.getElementById("trialStep2Back");
     const trialStep2Cancel = document.getElementById("trialStep2Cancel");
+
+    function openAdminConsole() {
+        adminConsoleOverlay?.classList.add("visible");
+        adminConsoleOverlay?.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        if (adminConsoleOutput) {
+            adminConsoleOutput.textContent = "Awaiting input.";
+        }
+        if (adminConsoleInput) {
+            adminConsoleInput.value = "";
+            adminConsoleInput.focus();
+        }
+        logEvent('BUTTON', 'Hidden Console Opened', { userId: currentUserId, user: currentUser });
+    }
+
+    function closeAdminConsole() {
+        adminConsoleOverlay?.classList.remove("visible");
+        adminConsoleOverlay?.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+    }
 
     function openModal() {
         addModalOverlay.classList.add("visible");
@@ -91,9 +137,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Wire up choice modal
+    secretConsoleBtn?.addEventListener("click", openAdminConsole);
     document.getElementById("addBtn")?.addEventListener("click", openModal);
     document.getElementById("openAddModalNav")?.addEventListener("click", openModal);
+    document.getElementById("closeAdminConsole")?.addEventListener("click", closeAdminConsole);
+    document.getElementById("cancelAdminConsole")?.addEventListener("click", closeAdminConsole);
     document.getElementById("closeAddModal")?.addEventListener("click", closeModal);
+    adminConsoleOverlay?.addEventListener("click", (e) => { if (e.target === adminConsoleOverlay) closeAdminConsole(); });
     addModalOverlay?.addEventListener("click", (e) => { if (e.target === addModalOverlay) closeModal(); });
 
     // Wire up choice buttons → open the right form
@@ -106,8 +156,66 @@ document.addEventListener("DOMContentLoaded", () => {
     subFormOverlay?.addEventListener("click", (e) => { if (e.target === subFormOverlay) closeSubForm(); });
     trialFormOverlay?.addEventListener("click", (e) => { if (e.target === trialFormOverlay) closeTrialForm(); });
 
+    adminConsoleForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const command = adminConsoleInput?.value.trim().toLowerCase();
+
+        if (!command) {
+            if (adminConsoleOutput) {
+                adminConsoleOutput.textContent = "Enter a command first.";
+            }
+            return;
+        }
+
+        logEvent('BUTTON', 'Hidden Console Command Submitted', { command, userId: currentUserId, user: currentUser });
+
+        if (command === 'resetusers' || command.startsWith('resetusers:')) {
+            const targetUser = command.includes(':') ? command.split(':')[1].trim() : null;
+            const confirmMsg = targetUser
+                ? `Are you sure you want to delete user "${targetUser}" and all their subscriptions? This cannot be undone.`
+                : 'Are you sure you want to delete ALL users and ALL subscriptions? This cannot be undone.';
+
+            if (!confirm(confirmMsg)) {
+                if (adminConsoleOutput) adminConsoleOutput.textContent = 'Cancelled.';
+                return;
+            }
+
+            if (adminConsoleOutput) adminConsoleOutput.textContent = 'Running...';
+
+            try {
+                const url = targetUser
+                    ? `/api/admin/reset-users?username=${encodeURIComponent(targetUser)}`
+                    : '/api/admin/reset-users';
+
+                const res = await fetch(url, { method: 'DELETE' });
+                const data = await res.json();
+
+                if (adminConsoleOutput) {
+                    adminConsoleOutput.textContent = data.success
+                        ? `✓ ${data.message}`
+                        : `✗ Error: ${data.error}`;
+                }
+                logEvent('ADMIN', 'reset-users command', { targetUser, success: data.success, message: data.message || data.error });
+
+                // If we just deleted the currently logged-in user, log them out
+                if (data.success && (!targetUser || targetUser.toLowerCase() === (currentUser || '').toLowerCase())) {
+                    currentUser = null;
+                    currentUserId = null;
+                    updateAuthUi();
+                }
+            } catch (err) {
+                if (adminConsoleOutput) adminConsoleOutput.textContent = `✗ Network error: ${err.message}`;
+            }
+            return;
+        }
+
+        if (adminConsoleOutput) {
+            adminConsoleOutput.textContent = `Unknown command: ${command}`;
+        }
+    });
+
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") { closeModal(); closeSubForm(); closeTrialForm(); }
+        if (e.key === "Escape") { closeAdminConsole(); closeModal(); closeSubForm(); closeTrialForm(); }
     });
 
     // ==========================================
@@ -203,12 +311,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!name || isNaN(amount) || !date || !billingCycle) {
             errorEl.textContent = "Please fill in all required fields.";
+            logEvent('BUTTON', 'Save Subscription Clicked', { reason: 'validation failed', error: 'missing fields' });
             return;
         }
         if (amount < 0) {
             errorEl.textContent = "Amount must be a positive number.";
+            logEvent('BUTTON', 'Save Subscription Clicked', { reason: 'validation failed', error: 'negative amount' });
             return;
         }
+
+        logEvent('BUTTON', 'Save Subscription Clicked', { name, amount, category, billingCycle });
 
         const personalValue = personalValueInput ? parseInt(personalValueInput.value || "5", 10) : 5;
 
@@ -241,10 +353,12 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log('Saving subscription:', newSub);
         const savedSub = await saveSubscription(newSub); // calls your new function
         console.log('Server save response:', savedSub);
+        logEvent('DB', 'INSERT subscriptions', { subId: newSub.id, name: newSub.name, status: 'success' });
         await loadSubscriptions();
         closeSubForm();
         } catch (err) {
             console.error('Subscription save failed:', err);
+            logEvent('DB', 'INSERT subscriptions', { subId: newSub.id, name: newSub.name, status: 'error', error: err.message });
             errorEl.textContent = "Failed to save. Is the server running?";
         }
             });
@@ -299,14 +413,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!name || !endDate || !billingCycle) {
             errorEl.textContent = "Please fill in all required fields.";
+            logEvent('BUTTON', 'Create Trial Clicked', { reason: 'validation failed', error: 'missing fields' });
             return;
         }
 
         const cost = costValue ? parseFloat(costValue) : 0;
         if (cost < 0) {
             errorEl.textContent = "Cost must be a positive number.";
+            logEvent('BUTTON', 'Create Trial Clicked', { reason: 'validation failed', error: 'negative cost' });
             return;
         }
+
+        logEvent('BUTTON', 'Create Trial Clicked', { name, cost, category, billingCycle });
 
         const monthlyAmount = computeMonthlyAmount(cost, billingCycle);
 
@@ -329,24 +447,32 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         } from merge, dont want this one */ 
 
-        const res = await fetch('/api/subscriptions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTrial)
-        });
+        try {
+            const res = await fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTrial)
+            });
 
-        console.log('Saving trial subscription:', newTrial);
+            console.log('Saving trial subscription:', newTrial);
 
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error('Trial save failed:', res.status, errorText);
-            throw new Error(`Server responded with ${res.status}`);
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error('Trial save failed:', res.status, errorText);
+                logEvent('DB', 'INSERT subscriptions (trial)', { trialId: newTrial.id, name: newTrial.name, status: 'error', error: `${res.status}: ${errorText}` });
+                throw new Error(`Server responded with ${res.status}`);
+            }
+
+            const savedTrial = await res.json();
+            console.log('Server trial save response:', savedTrial);
+            logEvent('DB', 'INSERT subscriptions (trial)', { trialId: newTrial.id, name: newTrial.name, status: 'success' });
+            await loadSubscriptions();
+            closeTrialForm();
+        } catch (err) {
+            console.error('Trial form error:', err);
+            logEvent('DB', 'INSERT subscriptions (trial)', { trialId: newTrial.id, name: newTrial.name, status: 'error', error: err.message });
+            errorEl.textContent = "Failed to save trial. Is the server running?";
         }
-
-        const savedTrial = await res.json();
-        console.log('Server trial save response:', savedTrial);
-        await loadSubscriptions();
-        closeTrialForm();
     });
 
     // ==========================================
@@ -354,10 +480,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
 
     //const VALID_USERS = { user1: "pass1", user2: "pass2" }; //replace with .env values for security
-
-
-    let currentUser = null;
-    let currentUserId = null;
 
     const loginOverlay = document.getElementById("loginOverlay");
     const loginForm = document.getElementById("loginForm");
@@ -397,8 +519,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!username || !email || !password) {
             if (signupError) signupError.textContent = "Please fill in username, email, and password.";
+            logEvent('BUTTON', 'Create Account Clicked', { reason: 'validation failed', error: 'missing fields' });
             return;
         }
+
+        logEvent('BUTTON', 'Create Account Clicked', { username, email });
 
         if (signupError) signupError.textContent = "";
 
@@ -412,9 +537,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             if (!res.ok || !data.success) {
+                logEvent('DB', 'INSERT accounts', { username, email, status: 'error', error: data.error });
                 if (signupError) signupError.textContent = data.error || 'Could not create account.';
                 return;
             }
+
+            logEvent('DB', 'INSERT accounts', { username, email, status: 'success', userId: data.account.id });
 
             if (loginUsername) loginUsername.value = username;
             if (loginPassword) loginPassword.value = '';
@@ -425,6 +553,7 @@ document.addEventListener("DOMContentLoaded", () => {
             setAuthMode("login");
         } catch (err) {
             console.error(err);
+            logEvent('DB', 'INSERT accounts', { username, email, status: 'error', error: err.message });
             if (signupError) signupError.textContent = 'Error connecting to server.';
         }
     });
@@ -450,6 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setAuthMode("login");
 
     logoutBtn?.addEventListener("click", () => {
+        logEvent('BUTTON', 'Logout Clicked', { userId: currentUserId, user: currentUser });
         currentUser = null;
         currentUserId = null;
         if (loginUsername) loginUsername.value = "";
@@ -466,7 +596,12 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
         const identifier = loginUsername?.value.trim();
         const password = loginPassword?.value;
-        if (!identifier || !password) return;
+        if (!identifier || !password) {
+            logEvent('BUTTON', 'Login Clicked', { reason: 'validation failed', error: 'missing fields' });
+            return;
+        }
+
+        logEvent('BUTTON', 'Login Clicked', { identifier });
 
     try {
         const res = await fetch('/api/login', {
@@ -476,17 +611,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await res.json();
         if (data.success) {
+            logEvent('DB', 'SELECT accounts', { identifier, status: 'success', userId: data.userId });
             currentUser = data.user;
             currentUserId = data.userId;
             loginError.textContent = '';
             setAuthMode("login");
             updateAuthUi();
-            loadSubscriptionsFromServer();
+            await loadSubscriptions();
         } else {
+            logEvent('DB', 'SELECT accounts', { identifier, status: 'error', error: 'invalid credentials' });
             loginError.textContent = 'Invalid username or password.';
         }
         } catch (err) {
             console.error(err);
+            logEvent('DB', 'SELECT accounts', { identifier, status: 'error', error: err.message });
             loginError.textContent = 'Error connecting to server.';
         }
     });
@@ -622,6 +760,12 @@ let subscriptions = []; //Subscription array to hold all subscription objects in
 // API FUNCTIONS
 // ==========================================
 async function loadSubscriptions() {
+    if (!currentUserId) {
+        subscriptions = [];
+        renderSubscriptions();
+        updateAllStats();
+        return;
+    }
     try {
         const res = await fetch(`/api/subscriptions?userId=${currentUserId}`);
         subscriptions = await res.json();
@@ -688,6 +832,9 @@ async function saveSubscription(sub) {
 code messing things up worse bruh */ 
 
 async function saveSubscription(sub) {
+    if (!currentUserId) {
+        throw new Error('User not authenticated. Please log in first.');
+    }
     console.log('POST /api/subscriptions request:', sub);
     const res = await fetch('/api/subscriptions', {
         method: 'POST',
@@ -698,7 +845,7 @@ async function saveSubscription(sub) {
     if (!res.ok) {
         const errorText = await res.text();
         console.error('POST /api/subscriptions failed:', res.status, errorText);
-        throw new Error(`Server responded with ${res.status}`);
+        throw new Error(`Server responded with ${res.status}: ${errorText}`);
     }
 
     const saved = await res.json();
@@ -708,6 +855,9 @@ async function saveSubscription(sub) {
 
 
 async function deleteSubscription(id) {
+    if (!currentUserId) {
+        throw new Error('User not authenticated. Please log in first.');
+    }
     try {
         const res = await fetch(`/api/subscriptions/${id}`, {
             method: 'DELETE',
@@ -938,11 +1088,14 @@ function renderSubscriptions() { // Creates/ updates subscription list, dynamica
 
 async function deleteSub(id) {
     if (confirm("Remove this subscription?")) {
+        logEvent('BUTTON', 'Delete Subscription Clicked', { subId: id });
         const ok = await deleteSubscription(id);
         if (!ok) {
+            logEvent('DB', 'DELETE subscriptions', { subId: id, status: 'error', error: 'delete failed' });
             alert("Failed to delete. Is the server running?");
             return;
         }
+        logEvent('DB', 'DELETE subscriptions', { subId: id, status: 'success' });
         subscriptions = subscriptions.filter(s => s.id !== id);
         renderSubscriptions();
         updateAllStats();

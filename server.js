@@ -25,8 +25,66 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'HTMLtest.html'));
 });
 
+// Event logging utility
+function logEvent(eventType, eventName, details = {}) {
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    eventType,
+    eventName,
+    details
+  };
+  
+  const logLine = `${timestamp} | [${eventType}] ${eventName} | ${JSON.stringify(details)}\n`;
+  
+  try {
+    fs.appendFileSync(EVENTS_LOG_PATH, logLine, 'utf-8');
+  } catch (err) {
+    console.error('Failed to write to events log:', err.message);
+  }
+  
+  return logEntry;
+}
+
+// Endpoint to receive logged events from frontend
+app.post('/api/log-event', (req, res) => {
+  const { eventType, eventName, details } = req.body;
+  
+  if (!eventType || !eventName) {
+    return res.status(400).json({ error: 'eventType and eventName required' });
+  }
+  
+  logEvent(eventType, eventName, details);
+  res.json({ success: true });
+});
+
+// Endpoint to view recent logs
+app.get('/api/logs', (req, res) => {
+  try {
+    if (!fs.existsSync(EVENTS_LOG_PATH)) {
+      return res.json({ success: true, logs: [] });
+    }
+    
+    const content = fs.readFileSync(EVENTS_LOG_PATH, 'utf-8');
+    const lines = content.split('\n').filter(line => line.trim()).slice(-100); // Last 100 lines
+    
+    res.json({ success: true, logCount: lines.length, logs: lines });
+  } catch (err) {
+    console.error('Failed to read events log:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to read logs' });
+  }
+});
+
 // Data file for email subscriptions only
 const DATA_DIR = path.join(__dirname, 'data');
+const LOGS_DIR = path.join(__dirname, 'logs');
+
+// Ensure logs directory exists
+if (!fs.existsSync(LOGS_DIR)) {
+  fs.mkdirSync(LOGS_DIR, { recursive: true });
+}
+
+const EVENTS_LOG_PATH = path.join(LOGS_DIR, 'events.log');
 
 const { Pool } = require("pg");
 
@@ -158,6 +216,7 @@ async function ensureAccountsTable() {
 
   await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS accounts_username_lower_uq ON accounts (LOWER(username))`);
   await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS accounts_email_lower_uq ON accounts (LOWER(email))`);
+
 }
 
 async function ensureDbTestTable() {
@@ -252,6 +311,7 @@ app.post('/api/signup', async (req, res) => {
 
   try {
     const passwordHash = hashPassword(password);
+
     const result = await pool.query(
       `INSERT INTO accounts (username, email, password_hash, display_name)
        VALUES ($1, $2, $3, $4)
@@ -360,6 +420,53 @@ app.delete('/api/subscriptions/:id', async (req, res) => {
   } catch (err) {
     console.error('Failed to delete subscription:', err.message);
     res.status(500).json({ error: 'Failed to delete subscription' });
+  }
+});
+
+// ==========================================
+// ADMIN CONSOLE ROUTES
+// ==========================================
+
+// DELETE /api/admin/reset-users?username=someuser
+// If username is provided, deletes only that user + their subscriptions.
+// If no username, deletes ALL users and ALL subscriptions.
+app.delete('/api/admin/reset-users', async (req, res) => {
+  const { username } = req.query;
+  try {
+    if (username) {
+      // Delete one user by username (case-insensitive)
+      const userResult = await pool.query(
+        'SELECT id FROM accounts WHERE LOWER(username) = LOWER($1)',
+        [username]
+      );
+      if (userResult.rows.length === 0) {
+        logEvent('ADMIN', 'reset-users (single)', { username, status: 'not_found' });
+        return res.status(404).json({ success: false, error: `User "${username}" not found.` });
+      }
+      const userId = userResult.rows[0].id;
+      await pool.query('DELETE FROM subscriptions WHERE user_id = $1', [userId]);
+      await pool.query('DELETE FROM accounts WHERE id = $1', [userId]);
+      logEvent('ADMIN', 'reset-users (single)', { username, userId, status: 'deleted' });
+      return res.json({ success: true, message: `Deleted user "${username}" and their subscriptions.` });
+    } else {
+      // Delete all subscriptions then all accounts, then reset ID sequence to 0
+      const subDel = await pool.query('DELETE FROM subscriptions RETURNING id');
+      const accDel = await pool.query('DELETE FROM accounts RETURNING id');
+      await pool.query(`ALTER SEQUENCE accounts_id_seq RESTART WITH 1`);
+      logEvent('ADMIN', 'reset-users (all)', {
+        status: 'deleted',
+        subscriptionsRemoved: subDel.rowCount,
+        accountsRemoved: accDel.rowCount
+      });
+      return res.json({
+        success: true,
+        message: `Deleted all ${accDel.rowCount} account(s) and ${subDel.rowCount} subscription(s).`
+      });
+    }
+  } catch (err) {
+    console.error('Admin reset-users error:', err);
+    logEvent('ADMIN', 'reset-users', { status: 'error', error: err.message });
+    return res.status(500).json({ success: false, error: 'Server error during reset.' });
   }
 });
 

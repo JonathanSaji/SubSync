@@ -16,10 +16,10 @@
 
   <header class="app-header" id="top">
     <nav class="nav-bar">
-      <div class="nav-left">
-        <img src=AppLogo.png>
+      <button class="nav-left nav-brand-btn" id="secretConsoleBtn" type="button" aria-label="Open hidden admin console">
+        <img src=AppLogo.png alt="SubSync logo">
         <div class="appName">SubSync</div>
-      </div>
+      </button>
 
       <div class="nav-center">
         <!-- href links to a id of an element -->
@@ -230,6 +230,30 @@
     </div>
   </div>
 </div>
+
+  <div class="modal-overlay" id="adminConsoleOverlay" aria-hidden="true">
+    <div class="modal admin-console-modal" role="dialog" aria-modal="true" aria-labelledby="adminConsoleTitle" style="max-width:520px;">
+      <button class="modal-close" id="closeAdminConsole" aria-label="Close">✕</button>
+
+      <div class="modal-icon-header">⌘</div>
+      <h2 class="modal-title" id="adminConsoleTitle">Hidden Console</h2>
+      <p class="modal-subtitle">Enter a command. `resetusers` is recognized, but not active yet.</p>
+
+      <form id="adminConsoleForm" novalidate>
+        <div class="form-group">
+          <label for="adminConsoleInput">Command</label>
+          <input type="text" id="adminConsoleInput" placeholder="Type a command" autocomplete="off" />
+        </div>
+
+        <p class="admin-console-output" id="adminConsoleOutput" aria-live="polite">Awaiting input.</p>
+
+        <div class="form-actions-row admin-console-actions">
+          <button type="button" class="btn btn-outline" id="cancelAdminConsole">Close</button>
+          <button type="submit" class="btn">Run</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
 
   <!-- ================ Add Subscription Function ===============-->

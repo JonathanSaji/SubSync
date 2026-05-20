@@ -1,0 +1,144 @@
+2026-05-15T14:22:34.443Z | [BUTTON] Create Account Clicked | {"username":"testuser","email":"test@example.com"}
+2026-05-15T14:22:34.696Z | [DB] INSERT accounts | {"username":"testuser","email":"test@example.com","status":"success","userId":"7"}
+2026-05-15T14:22:41.893Z | [BUTTON] Login Clicked | {"identifier":"testuser"}
+2026-05-15T14:22:42.042Z | [DB] SELECT accounts | {"identifier":"testuser","status":"success","userId":7}
+2026-05-15T14:23:49.514Z | [BUTTON] Save Subscription Clicked | {"name":"Netflix","amount":15.99,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:23:49.599Z | [DB] INSERT subscriptions | {"subId":1778855029511,"name":"Netflix","status":"success"}
+2026-05-15T14:24:48.274Z | [BUTTON] Login Clicked | {"identifier":"testuser"}
+2026-05-15T14:24:48.427Z | [DB] SELECT accounts | {"identifier":"testuser","status":"success","userId":7}
+2026-05-15T14:26:38.924Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-15T14:26:39.134Z | [DB] SELECT accounts | {"identifier":"user1","status":"error","error":"invalid credentials"}
+2026-05-15T14:26:59.223Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-15T14:26:59.272Z | [DB] SELECT accounts | {"identifier":"user1","status":"error","error":"invalid credentials"}
+2026-05-15T14:27:00.627Z | [BUTTON] Create Account Clicked | {"username":"test2","email":"test2@gmail.com"}
+2026-05-15T14:27:00.755Z | [DB] INSERT accounts | {"username":"test2","email":"test2@gmail.com","status":"error","error":"username or email already exists"}
+2026-05-15T14:27:11.798Z | [BUTTON] Create Account Clicked | {"username":"test3","email":"test3@gmail.com"}
+2026-05-15T14:27:11.903Z | [DB] INSERT accounts | {"username":"test3","email":"test3@gmail.com","status":"success","userId":"9"}
+2026-05-15T14:27:14.442Z | [BUTTON] Login Clicked | {"identifier":"test3"}
+2026-05-15T14:27:14.577Z | [DB] SELECT accounts | {"identifier":"test3","status":"success","userId":9}
+2026-05-15T14:27:14.579Z | [DB] SELECT accounts | {"identifier":"test3","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:30:02.077Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":23,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:30:02.078Z | [DB] INSERT subscriptions | {"subId":1778855402048,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:30:03.443Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":23,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:30:03.445Z | [DB] INSERT subscriptions | {"subId":1778855403442,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:30:03.653Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":23,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:30:03.657Z | [DB] INSERT subscriptions | {"subId":1778855403652,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:30:03.858Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":23,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:30:03.859Z | [DB] INSERT subscriptions | {"subId":1778855403857,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:32:48.756Z | [BUTTON] Logout Clicked | {"userId":9,"user":"test3"}
+2026-05-15T14:32:56.771Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-15T14:32:56.915Z | [DB] SELECT accounts | {"identifier":"test1","status":"success","userId":2}
+2026-05-15T14:32:56.917Z | [DB] SELECT accounts | {"identifier":"test1","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:33:08.195Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:33:08.222Z | [DB] INSERT subscriptions | {"subId":1778855588192,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:33:08.993Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:33:08.995Z | [DB] INSERT subscriptions | {"subId":1778855588993,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:33:09.196Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:33:09.197Z | [DB] INSERT subscriptions | {"subId":1778855589195,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:33:09.542Z | [BUTTON] Save Subscription Clicked | {"name":"asdf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:33:09.543Z | [DB] INSERT subscriptions | {"subId":1778855589542,"name":"asdf","status":"error","error":"currentUserId is not defined"}
+2026-05-15T14:36:11.894Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-15T14:36:12.044Z | [DB] SELECT accounts | {"identifier":"test1","status":"error","error":"invalid credentials"}
+2026-05-15T14:36:31.257Z | [BUTTON] Create Account Clicked | {"username":"demo","email":"demo@test.com"}
+2026-05-15T14:36:31.381Z | [DB] INSERT accounts | {"username":"demo","email":"demo@test.com","status":"success","userId":"10"}
+2026-05-15T14:36:38.175Z | [BUTTON] Login Clicked | {"identifier":"demo"}
+2026-05-15T14:36:38.336Z | [DB] SELECT accounts | {"identifier":"demo","status":"success","userId":10}
+2026-05-15T14:38:26.814Z | [BUTTON] Save Subscription Clicked | {"reason":"validation failed","error":"missing fields"}
+2026-05-15T14:38:27.812Z | [BUTTON] Save Subscription Clicked | {"reason":"validation failed","error":"missing fields"}
+2026-05-15T14:38:30.499Z | [BUTTON] Save Subscription Clicked | {"name":"demo","amount":9,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:38:30.551Z | [DB] INSERT subscriptions | {"subId":1778855910495,"name":"demo","status":"success"}
+2026-05-15T14:38:32.810Z | [BUTTON] Logout Clicked | {"userId":10,"user":"demo"}
+2026-05-15T14:38:37.575Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-15T14:38:37.728Z | [DB] SELECT accounts | {"identifier":"test1","status":"success","userId":2}
+2026-05-15T14:38:51.257Z | [BUTTON] Save Subscription Clicked | {"name":"test1","amount":34,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-15T14:38:51.307Z | [DB] INSERT subscriptions | {"subId":1778855931253,"name":"test1","status":"success"}
+2026-05-19T14:15:22.468Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:15:22.621Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"success","userId":2}
+2026-05-19T14:26:01.172Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:26:01.323Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"success","userId":2}
+2026-05-19T14:26:05.036Z | [BUTTON] Hidden Console Opened | {"userId":2,"user":"test1"}
+2026-05-19T14:26:15.972Z | [BUTTON] Hidden Console Command Submitted | {"command":"resetusers","userId":2,"user":"test1"}
+2026-05-19T14:30:22.301Z | [BUTTON] Login Clicked | {"identifier":"zayaan"}
+2026-05-19T14:30:22.357Z | [DB] SELECT accounts | {"identifier":"zayaan","status":"error","error":"invalid credentials"}
+2026-05-19T14:30:27.786Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:30:27.933Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"success","userId":2}
+2026-05-19T14:30:29.602Z | [BUTTON] Hidden Console Opened | {"userId":2,"user":"test1"}
+2026-05-19T14:30:51.035Z | [BUTTON] Hidden Console Command Submitted | {"command":"resetusers:test2","userId":2,"user":"test1"}
+2026-05-19T14:30:58.117Z | [ADMIN] reset-users (single) | {"username":"test2","userId":"3","status":"deleted"}
+2026-05-19T14:30:58.121Z | [ADMIN] reset-users command | {"targetUser":"test2","success":true,"message":"Deleted user \"test2\" and their subscriptions."}
+2026-05-19T14:31:57.748Z | [BUTTON] Logout Clicked | {"userId":2,"user":"test1"}
+2026-05-19T14:32:12.487Z | [BUTTON] Login Clicked | {"identifier":"test2"}
+2026-05-19T14:32:12.537Z | [DB] SELECT accounts | {"identifier":"test2","status":"error","error":"invalid credentials"}
+2026-05-19T14:32:40.205Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:32:40.378Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"success","userId":2}
+2026-05-19T14:32:41.483Z | [BUTTON] Logout Clicked | {"userId":2,"user":"test1"}
+2026-05-19T14:32:51.318Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:32:51.433Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"error","error":"invalid credentials"}
+2026-05-19T14:32:56.421Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:32:56.608Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"success","userId":2}
+2026-05-19T14:32:57.782Z | [BUTTON] Hidden Console Opened | {"userId":2,"user":"test1"}
+2026-05-19T14:33:00.323Z | [BUTTON] Hidden Console Command Submitted | {"command":"resetusers","userId":2,"user":"test1"}
+2026-05-19T14:33:02.196Z | [ADMIN] reset-users (all) | {"status":"deleted","subscriptionsRemoved":5,"accountsRemoved":8}
+2026-05-19T14:33:02.200Z | [ADMIN] reset-users command | {"targetUser":null,"success":true,"message":"Deleted all 8 account(s) and 5 subscription(s)."}
+2026-05-19T14:33:03.981Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:33:04.030Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"error","error":"invalid credentials"}
+2026-05-19T14:41:19.195Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:41:19.245Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"error","error":"invalid credentials"}
+2026-05-19T14:41:34.162Z | [BUTTON] Login Clicked | {"identifier":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:41:34.217Z | [DB] SELECT accounts | {"identifier":"zayaan.hamid.zh@gmail.com","status":"error","error":"invalid credentials"}
+2026-05-19T14:41:38.946Z | [BUTTON] Create Account Clicked | {"username":"user1","email":"user1@gmail.com"}
+2026-05-19T14:41:39.198Z | [DB] INSERT accounts | {"username":"user1","email":"user1@gmail.com","status":"success","userId":"11"}
+2026-05-19T14:41:43.323Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-19T14:41:43.490Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":11}
+2026-05-19T14:48:03.092Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-19T14:48:03.268Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":11}
+2026-05-19T14:48:11.967Z | [BUTTON] Logout Clicked | {"userId":11,"user":"user1"}
+2026-05-19T14:49:35.773Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-19T14:49:35.833Z | [DB] SELECT accounts | {"identifier":"test1","status":"error","error":"invalid credentials"}
+2026-05-19T14:49:37.061Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-19T14:49:37.115Z | [DB] SELECT accounts | {"identifier":"test1","status":"error","error":"invalid credentials"}
+2026-05-19T14:49:37.677Z | [BUTTON] Login Clicked | {"identifier":"test1"}
+2026-05-19T14:49:37.730Z | [DB] SELECT accounts | {"identifier":"test1","status":"error","error":"invalid credentials"}
+2026-05-19T14:49:45.241Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-19T14:49:45.411Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":11}
+2026-05-19T14:49:58.838Z | [BUTTON] Save Subscription Clicked | {"name":"netflix","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-19T14:49:58.936Z | [DB] INSERT subscriptions | {"subId":1779202198833,"name":"netflix","status":"success"}
+2026-05-19T14:51:09.425Z | [BUTTON] Logout Clicked | {"userId":11,"user":"user1"}
+2026-05-19T14:51:27.076Z | [BUTTON] Create Account Clicked | {"username":"user2","email":"zayaan.hamid.zh@gmail.com"}
+2026-05-19T14:51:27.239Z | [DB] INSERT accounts | {"username":"user2","email":"zayaan.hamid.zh@gmail.com","status":"error","error":"username or email already exists"}
+2026-05-19T14:51:36.845Z | [BUTTON] Create Account Clicked | {"username":"user2","email":"zhami5@ocdsb.ca"}
+2026-05-19T14:51:36.974Z | [DB] INSERT accounts | {"username":"user2","email":"zhami5@ocdsb.ca","status":"success","userId":"13"}
+2026-05-19T14:51:39.794Z | [BUTTON] Login Clicked | {"identifier":"user2"}
+2026-05-19T14:51:39.952Z | [DB] SELECT accounts | {"identifier":"user2","status":"success","userId":13}
+2026-05-19T14:51:51.185Z | [BUTTON] Save Subscription Clicked | {"name":"adobe","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-19T14:51:51.233Z | [DB] INSERT subscriptions | {"subId":1779202311184,"name":"adobe","status":"success"}
+2026-05-19T14:51:59.793Z | [BUTTON] Save Subscription Clicked | {"name":"sf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-19T14:51:59.853Z | [DB] INSERT subscriptions | {"subId":1779202319791,"name":"sf","status":"success"}
+2026-05-19T23:57:55.493Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-19T23:57:55.651Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":11}
+2026-05-19T23:58:00.394Z | [BUTTON] Delete Subscription Clicked | {"subId":1779202198833}
+2026-05-19T23:58:00.441Z | [DB] DELETE subscriptions | {"subId":1779202198833,"status":"success"}
+2026-05-19T23:58:11.848Z | [BUTTON] Save Subscription Clicked | {"name":"sadf","amount":3,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-19T23:58:11.904Z | [DB] INSERT subscriptions | {"subId":1779235091845,"name":"sadf","status":"success"}
+2026-05-19T23:58:49.393Z | [BUTTON] Logout Clicked | {"userId":11,"user":"user1"}
+2026-05-19T23:59:23.197Z | [BUTTON] Create Account Clicked | {"username":"krish","email":"kkann3@ocdsb.ca"}
+2026-05-19T23:59:23.302Z | [DB] INSERT accounts | {"username":"krish","email":"kkann3@ocdsb.ca","status":"success","userId":"14"}
+2026-05-19T23:59:25.532Z | [BUTTON] Login Clicked | {"identifier":"krish"}
+2026-05-19T23:59:25.622Z | [DB] SELECT accounts | {"identifier":"krish","status":"success","userId":14}
+2026-05-19T23:59:42.845Z | [BUTTON] Save Subscription Clicked | {"name":"boi is ts email tuff","amount":67,"category":"Entertainment","billingCycle":"Monthly"}
+2026-05-19T23:59:42.883Z | [DB] INSERT subscriptions | {"subId":1779235182843,"name":"boi is ts email tuff","status":"success"}
+2026-05-19T23:59:48.078Z | [BUTTON] Logout Clicked | {"userId":14,"user":"krish"}
+2026-05-19T23:59:56.433Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-19T23:59:56.544Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":11}
+2026-05-19T23:59:57.756Z | [BUTTON] Hidden Console Opened | {"userId":11,"user":"user1"}
+2026-05-20T00:00:05.490Z | [BUTTON] Hidden Console Command Submitted | {"command":"resetusers","userId":11,"user":"user1"}
+2026-05-20T00:00:06.544Z | [ADMIN] reset-users (all) | {"status":"deleted","subscriptionsRemoved":4,"accountsRemoved":3}
+2026-05-20T00:00:06.551Z | [ADMIN] reset-users command | {"targetUser":null,"success":true,"message":"Deleted all 3 account(s) and 4 subscription(s)."}
+2026-05-20T00:00:09.002Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-20T00:00:09.041Z | [DB] SELECT accounts | {"identifier":"user1","status":"error","error":"invalid credentials"}
+2026-05-20T00:00:23.413Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-20T00:00:23.448Z | [DB] SELECT accounts | {"identifier":"user1","status":"error","error":"invalid credentials"}
+2026-05-20T00:00:27.780Z | [BUTTON] Create Account Clicked | {"username":"user1","email":"zhami5@ocdsb.ca"}
+2026-05-20T00:00:27.895Z | [DB] INSERT accounts | {"username":"user1","email":"zhami5@ocdsb.ca","status":"success","userId":"1"}
+2026-05-20T00:00:29.922Z | [BUTTON] Login Clicked | {"identifier":"user1"}
+2026-05-20T00:00:30.029Z | [DB] SELECT accounts | {"identifier":"user1","status":"success","userId":1}
