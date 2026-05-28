@@ -624,10 +624,14 @@ setInterval(() => {
 
 async function startServer() {
   try {
-    await ensureSubscriptionsTable();
-    await ensureAccountsTable();
-    console.log('Subscriptions table is ready');
-    console.log('Accounts table is ready');
+    if (process.env.DATABASE_URL) {
+      await ensureSubscriptionsTable();
+      await ensureAccountsTable();
+      console.log('Subscriptions table is ready');
+      console.log('Accounts table is ready');
+    } else {
+      console.log('DATABASE_URL not set, skipping database initialization');
+    }
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
