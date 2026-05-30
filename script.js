@@ -24,12 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // MODAL LOGIC
     // ==========================================
-    const secretConsoleBtn = document.getElementById("secretConsoleBtn");
     const addModalOverlay = document.getElementById("addModalOverlay");
-    const adminConsoleOverlay = document.getElementById("adminConsoleOverlay");
-    const adminConsoleForm = document.getElementById("adminConsoleForm");
-    const adminConsoleInput = document.getElementById("adminConsoleInput");
-    const adminConsoleOutput = document.getElementById("adminConsoleOutput");
     const subFormOverlay = document.getElementById("subFormOverlay");
     const trialFormOverlay = document.getElementById("trialFormOverlay");
 
@@ -57,26 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const trialStep1Back = document.getElementById("trialStep1Back");
     const trialStep2Back = document.getElementById("trialStep2Back");
     const trialStep2Cancel = document.getElementById("trialStep2Cancel");
-
-    function openAdminConsole() {
-        adminConsoleOverlay?.classList.add("visible");
-        adminConsoleOverlay?.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-        if (adminConsoleOutput) {
-            adminConsoleOutput.textContent = "Awaiting input.";
-        }
-        if (adminConsoleInput) {
-            adminConsoleInput.value = "";
-            adminConsoleInput.focus();
-        }
-        logEvent('BUTTON', 'Hidden Console Opened', { userId: currentUserId, user: currentUser });
-    }
-
-    function closeAdminConsole() {
-        adminConsoleOverlay?.classList.remove("visible");
-        adminConsoleOverlay?.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
-    }
 
     function openModal() {
         addModalOverlay.classList.add("visible");
@@ -137,13 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Wire up choice modal
-    secretConsoleBtn?.addEventListener("click", openAdminConsole);
     document.getElementById("addBtn")?.addEventListener("click", openModal);
     document.getElementById("openAddModalNav")?.addEventListener("click", openModal);
-    document.getElementById("closeAdminConsole")?.addEventListener("click", closeAdminConsole);
-    document.getElementById("cancelAdminConsole")?.addEventListener("click", closeAdminConsole);
     document.getElementById("closeAddModal")?.addEventListener("click", closeModal);
-    adminConsoleOverlay?.addEventListener("click", (e) => { if (e.target === adminConsoleOverlay) closeAdminConsole(); });
     addModalOverlay?.addEventListener("click", (e) => { if (e.target === addModalOverlay) closeModal(); });
 
     // Wire up choice buttons → open the right form
@@ -156,66 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
     subFormOverlay?.addEventListener("click", (e) => { if (e.target === subFormOverlay) closeSubForm(); });
     trialFormOverlay?.addEventListener("click", (e) => { if (e.target === trialFormOverlay) closeTrialForm(); });
 
-    adminConsoleForm?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const command = adminConsoleInput?.value.trim().toLowerCase();
-
-        if (!command) {
-            if (adminConsoleOutput) {
-                adminConsoleOutput.textContent = "Enter a command first.";
-            }
-            return;
-        }
-
-        logEvent('BUTTON', 'Hidden Console Command Submitted', { command, userId: currentUserId, user: currentUser });
-
-        if (command === 'resetusers' || command.startsWith('resetusers:')) {
-            const targetUser = command.includes(':') ? command.split(':')[1].trim() : null;
-            const confirmMsg = targetUser
-                ? `Are you sure you want to delete user "${targetUser}" and all their subscriptions? This cannot be undone.`
-                : 'Are you sure you want to delete ALL users and ALL subscriptions? This cannot be undone.';
-
-            if (!confirm(confirmMsg)) {
-                if (adminConsoleOutput) adminConsoleOutput.textContent = 'Cancelled.';
-                return;
-            }
-
-            if (adminConsoleOutput) adminConsoleOutput.textContent = 'Running...';
-
-            try {
-                const url = targetUser
-                    ? `/api/admin/reset-users?username=${encodeURIComponent(targetUser)}`
-                    : '/api/admin/reset-users';
-
-                const res = await fetch(url, { method: 'DELETE' });
-                const data = await res.json();
-
-                if (adminConsoleOutput) {
-                    adminConsoleOutput.textContent = data.success
-                        ? `✓ ${data.message}`
-                        : `✗ Error: ${data.error}`;
-                }
-                logEvent('ADMIN', 'reset-users command', { targetUser, success: data.success, message: data.message || data.error });
-
-                // If we just deleted the currently logged-in user, log them out
-                if (data.success && (!targetUser || targetUser.toLowerCase() === (currentUser || '').toLowerCase())) {
-                    currentUser = null;
-                    currentUserId = null;
-                    updateAuthUi();
-                }
-            } catch (err) {
-                if (adminConsoleOutput) adminConsoleOutput.textContent = `✗ Network error: ${err.message}`;
-            }
-            return;
-        }
-
-        if (adminConsoleOutput) {
-            adminConsoleOutput.textContent = `Unknown command: ${command}`;
-        }
-    });
-
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") { closeAdminConsole(); closeModal(); closeSubForm(); closeTrialForm(); }
+        if (e.key === "Escape") { closeModal(); closeSubForm(); closeTrialForm(); }
     });
 
     // ==========================================
