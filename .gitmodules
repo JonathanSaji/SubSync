@@ -1,3 +1,24 @@
 [submodule "LandingPage/LandingPage"]
 	path = LandingPage/LandingPage
 	url = https://github.com/JonathanSaji/LandingPage.git
+[submodule "FluencySync/Fluency"]
+	path = FluencySync/Fluency
+	url = https://github.com/JonathanSaji/Fluency.git
+[submodule "BrainSync/BrainSync"]
+	path = BrainSync/BrainSync
+	url = https://github.com/CosmicLegacy2296/BrainSync.git
+[submodule "SteadySync/SteadySync"]
+	path = SteadySync/SteadySync
+	url = https://github.com/JonathanSaji/SteadySync.git
+[submodule "TravelSync/TravelSync"]
+	path = TravelSync/TravelSync
+	url = https://github.com/Pascal-Huang/TravelSync..git
+[submodule "SeatSync/SeatSync"]
+	path = SeatSync/SeatSync
+	url = https://github.com/CosmicLegacy2296/SeatSync.git
+[submodule "PhotoSync/PhotoSync"]
+	path = PhotoSync/PhotoSync
+	url = https://github.com/Scoopiezz/PhotoSync
+[submodule "TrackerSync/TrackerSync"]
+	path = TrackerSync/TrackerSync
+	url = https://github.com/JonathanSaji/TrackerSync.git
